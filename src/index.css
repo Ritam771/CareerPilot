@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* CareerPilot navigation-style background */
+.navigation-pattern {
+  background-image:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(190, 180, 155, 0.18) 1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(190, 180, 155, 0.15) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      120deg,
+      transparent 48%,
+      rgba(190, 180, 155, 0.08) 49%,
+      transparent 50%
+    ),
+    linear-gradient(
+      30deg,
+      transparent 48%,
+      rgba(190, 180, 155, 0.06) 49%,
+      transparent 50%
+    );
+
+  background-size:
+    80px 80px,
+    120px 120px,
+    160px 160px,
+    180px 180px;
+
+  opacity: 0.8;
+}
