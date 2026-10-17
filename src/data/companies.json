@@ -1,0 +1,43 @@
+
+[
+  {
+    "id": "tcs",
+    "name": "Tata Consultancy Services",
+    "logo": "/Tcs logo.jpg"
+  },
+  {
+    "id": "infosys",
+    "name": "Infosys",
+    "logo": "/infosys logo.jpg"
+  },
+  {
+    "id": "wipro",
+    "name": "Wipro",
+    "logo": "/Wipro logo.jpg"
+  },
+  {
+    "id": "accenture",
+    "name": "Accenture",
+    "logo": "/accenture logo.png"
+  },
+  {
+    "id": "ey",
+    "name": "Ernst & Young",
+    "logo": "/ey.jpg"
+  },
+  {
+    "id":"cognizant", 
+    "name": "Cognizant",
+    "logo": "/cognizant logo.png"
+  },
+  {
+    "id":"capgemini",
+    "name": "Capgemini",
+    "logo": "/capgemini logo.png"
+  },
+  {
+    "id":"deloitte",
+    "name": "Deloitte",
+    "logo": "/deloitte logo.png"
+  }
+]

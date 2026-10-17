@@ -5,7 +5,8 @@ import Dashboard from "./pages/Dashboard"
 import Aptitude from "./pages/Aptitude"
 import Reasoning from "./pages/Reasoning"
 import Technical from "./pages/Technical"
-
+import Coding from "./pages/Coding"
+import Companyprep from "./pages/Comapnyprep"
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
         <Route path="/aptitude" element={<Aptitude />} />
         <Route path="/reasoning" element={<Reasoning />} />
         <Route path="/technical" element={<Technical />} />
+        <Route path="/coding" element={<Coding />} />
+        <Route path="/company-prep" element={<Companyprep />} />
       </Routes>
     </BrowserRouter>
   )

@@ -137,41 +137,62 @@ const Sidebar = ({ darkMode }) => {
 
         {/* Technical */}
 
-        <li
-          className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
-            darkMode
-              ? "text-gray-300 hover:bg-gray-700"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-
-          <FiCode />
-
-          <span>
-            Technical
-          </span>
-
+       <li>
+          <NavLink
+            to="/technical"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
+              darkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <FiCode />
+            <span>
+              Technical
+            </span>
+          </NavLink>
         </li>
 
-
+        {/* Coding */}
+<li>
+  <NavLink
+    to="/coding"
+    className={({ isActive }) =>
+      `flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
+        isActive
+          ? "bg-blue-900 text-white"
+          : darkMode
+            ? "text-gray-300 hover:bg-gray-700"
+            : "text-gray-700 hover:bg-gray-100"
+      }`
+    }
+  >
+    <FiCode />
+    <span>Coding</span>
+  </NavLink>
+</li>
         {/* Company Prep */}
 
-        <li
-          className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
-            darkMode
-              ? "text-gray-300 hover:bg-gray-700"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-        >
+        <li>
 
-          <FiBriefcase />
+          <NavLink
+            to="/company-prep"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
+              darkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
 
-          <span>
-            Company Prep
-          </span>
+            <FiBriefcase />
+
+            <span>
+              Company Prep
+            </span>
+
+          </NavLink>
 
         </li>
-
 
         {/* Mock Tests */}
 

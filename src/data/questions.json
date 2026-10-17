@@ -1,0 +1,92 @@
+[
+    {
+        "id": 1,
+        "question": "Which of the following is an object-oriented programming concept?",
+        "options": [
+            {
+                "id": 101,
+                "text": "Inheritance"
+            },
+            {
+                "id": 102,
+                "text": "Compilation"
+            },
+            {
+                "id": 103,
+                "text": "Execution"
+            },
+            {
+                "id": 104,
+                "text": "Linking"
+            }
+        ]
+    },
+    { 
+         "id": 2,
+         "question": "Which protocol is connection-oriented?",
+         "options": [
+            { 
+                "id": 201,
+                "text": "TCP"
+            },
+            {
+                "id": 202,
+                "text": "UDP"
+            },
+            { 
+                "id": 203,
+                "text": "IP"
+            },
+            {
+                "id": 204,
+                "text": "DNS"
+            }
+         ]
+    },
+    {
+        "id": 3,
+        "question": " Which of  the following is a NoSQL database?",
+        "options" : [
+            {
+                "id":301,
+                "text": "MongoDB"
+            },
+            { 
+                "id":302,
+                "text": "MySQL"
+            },
+            {
+                "id":303,
+                "text":"PostgreSQL"
+            },
+            {
+                "id":304,
+                "text":"Oracle"
+            }
+
+        ]
+    },
+     {
+        "id": 4,
+        "question": "Which of the following is an object-oriented programming concept?",
+        "options": [
+            {
+                "id": 101,
+                "text": "Inheritance"
+            },
+            {
+                "id": 102,
+                "text": "Compilation"
+            },
+            {
+                "id": 103,
+                "text": "Execution"
+            },
+            {
+                "id": 104,
+                "text": "Linking"
+            }
+        ]
+    }
+
+]
