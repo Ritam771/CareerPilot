@@ -7,6 +7,8 @@ import Reasoning from "./pages/Reasoning"
 import Technical from "./pages/Technical"
 import Coding from "./pages/Coding"
 import Companyprep from "./pages/Comapnyprep"
+import Profile from "./pages/Profile"
+import Settings from "./pages/Settings"
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/technical" element={<Technical />} />
         <Route path="/coding" element={<Coding />} />
         <Route path="/company-prep" element={<Companyprep />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="settings" element={<Settings/>} />
       </Routes>
     </BrowserRouter>
   )

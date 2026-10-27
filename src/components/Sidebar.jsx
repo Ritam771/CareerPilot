@@ -69,22 +69,21 @@ const Sidebar = ({ darkMode }) => {
 
 
         {/* Profile */}
-
-        <li
-          className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
-            darkMode
-              ? "text-gray-300 hover:bg-gray-700"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-
-          <FiUser />
-
-          <span>
-            Profile
-          </span>
-
+        <li>
+          <NavLink
+            to="/profile"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
+              darkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <FiUser />
+            <span>Profile</span>
+          </NavLink>
         </li>
+      
+        
 
 
         {/* Aptitude */}
@@ -284,23 +283,23 @@ const Sidebar = ({ darkMode }) => {
 
 
         {/* Settings */}
-
-        <div
-          className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
-            darkMode
-              ? "text-gray-300 hover:bg-gray-700"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-
-          <FiSettings />
-
-          <span>
-            Settings
-          </span>
-
-        </div>
-
+        <li><NavLink
+  to="/settings"
+  className={({ isActive }) =>
+    `flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
+      isActive
+        ? "bg-blue-900 text-white"
+        : darkMode
+          ? "text-gray-300 hover:bg-gray-700"
+          : "text-gray-700 hover:bg-gray-100"
+    }`
+  }
+>
+  <FiSettings />
+  <span>Settings</span>
+</NavLink>
+        </li>
+       
 
         {/* Logout */}
 
