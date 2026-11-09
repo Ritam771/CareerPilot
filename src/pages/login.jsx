@@ -16,6 +16,7 @@ function Login() {
 
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
 
   return (
     <div className="min-h-screen bg-[#f4f1e9] flex items-center justify-center p-4">

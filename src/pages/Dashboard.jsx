@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom'
 import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 
@@ -6,6 +7,7 @@ import {
   FiMoon,
   FiSearch,
   FiBell,
+  FiSettings,
 } from 'react-icons/fi'
 
 
@@ -138,7 +140,24 @@ const Dashboard = () => {
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
 
             </button>
+             
+             {/* ================= SETTINGS ================= */}
 
+<NavLink
+  to="/settings"
+  title="Settings"
+  className={({ isActive }) =>
+    `w-9 h-9 rounded-full flex items-center justify-center transition ${
+      isActive
+        ? "bg-indigo-100 text-indigo-900"
+        : darkMode
+          ? "text-gray-300 hover:bg-gray-700"
+          : "text-gray-600 hover:bg-gray-100"
+    }`
+  }
+>
+  <FiSettings size={19} />
+</NavLink>
 
             {/* ================= ACCOUNT ================= */}
 

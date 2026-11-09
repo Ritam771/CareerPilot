@@ -9,6 +9,10 @@ import Coding from "./pages/Coding"
 import Companyprep from "./pages/Comapnyprep"
 import Profile from "./pages/Profile"
 import Settings from "./pages/Settings"
+import MockTests from "./pages/MockTests"
+import Performance from "./pages/Performance"
+import AIInterview from "./pages/AIInterview"
+
 
 function App() {
   return (
@@ -22,7 +26,10 @@ function App() {
         <Route path="/coding" element={<Coding />} />
         <Route path="/company-prep" element={<Companyprep />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="settings" element={<Settings/>} />
+        <Route path="/settings" element={<Settings/>} />
+        <Route path="/mock-tests" element={<MockTests/>} />
+        <Route path="/performance" element={<Performance/>} />
+        <Route path="/ai-interview" element={<AIInterview/>} />
       </Routes>
     </BrowserRouter>
   )
