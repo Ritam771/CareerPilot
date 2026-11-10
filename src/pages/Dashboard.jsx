@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/Sidebar";
 import { getCurrentUser, logoutUser } from "../services/auth";
@@ -13,12 +13,14 @@ import {
   FiBell,
   FiUser,
   FiLogOut,
+  FiSettings,
 } from "react-icons/fi";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
   const { darkMode, toggleDarkMode } = useTheme();
+
   const [user, setUser] = useState(null);
 
   // Get currently logged-in user
@@ -39,7 +41,7 @@ const Dashboard = () => {
     navigate("/", { replace: true });
   };
 
-  // Get profile initials dynamically
+  // Generate profile initials dynamically
   const getInitials = (name) => {
     if (!name) return "U";
 
@@ -74,6 +76,7 @@ const Dashboard = () => {
         {/* Header */}
         <header className="flex flex-wrap items-center justify-between gap-4 mb-8">
 
+          {/* Greeting */}
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">
               Welcome back, {user.name || "User"}!
@@ -93,6 +96,7 @@ const Dashboard = () => {
 
             {/* Search */}
             <button
+              type="button"
               className="p-3 rounded-xl hover:bg-gray-500/10"
               aria-label="Search"
             >
@@ -101,14 +105,41 @@ const Dashboard = () => {
 
             {/* Notifications */}
             <button
-              className="p-3 rounded-xl hover:bg-gray-500/10"
+              type="button"
               aria-label="Notifications"
+              className={`relative w-9 h-9 rounded-full flex items-center justify-center transition ${
+                darkMode
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
             >
-              <FiBell size={20} />
+              <FiBell size={19} />
+
+              {/* Notification Indicator */}
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
             </button>
+
+            {/* Settings */}
+            <NavLink
+              to="/settings"
+              title="Settings"
+              aria-label="Settings"
+              className={({ isActive }) =>
+                `w-9 h-9 rounded-full flex items-center justify-center transition ${
+                  isActive
+                    ? "bg-indigo-100 text-indigo-900"
+                    : darkMode
+                    ? "text-gray-300 hover:bg-gray-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`
+              }
+            >
+              <FiSettings size={19} />
+            </NavLink>
 
             {/* Dark Mode */}
             <button
+              type="button"
               onClick={toggleDarkMode}
               className="p-3 rounded-xl hover:bg-gray-500/10"
               aria-label="Toggle dark mode"
@@ -120,24 +151,34 @@ const Dashboard = () => {
               )}
             </button>
 
-            {/* Profile */}
+            {/* User Profile */}
             <div className="flex items-center gap-2">
+
+              {/* Profile Initials */}
               <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
                 {getInitials(user.name)}
               </div>
 
+              {/* User Details */}
               <div className="hidden sm:block">
                 <p className="text-sm font-semibold">
                   {user.name || "User"}
                 </p>
-                <p className="text-xs text-gray-500">
+
+                <p
+                  className={`text-xs ${
+                    darkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   {user.email || ""}
                 </p>
               </div>
+
             </div>
 
             {/* Logout */}
             <button
+              type="button"
               onClick={handleLogout}
               className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
             >
@@ -151,39 +192,52 @@ const Dashboard = () => {
         {/* Dashboard Content */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
+          {/* Welcome Card */}
           <div className="p-6 rounded-2xl bg-indigo-600 text-white shadow">
             <p className="text-sm opacity-80">Welcome</p>
+
             <h2 className="text-2xl font-bold mt-2">
               {user.name || "User"}
             </h2>
+
             <p className="text-sm mt-2 opacity-80">
               Your dashboard is ready.
             </p>
           </div>
 
+          {/* Account Status */}
           <div
             className={`p-6 rounded-2xl shadow ${
               darkMode ? "bg-gray-900" : "bg-white"
             }`}
           >
-            <p className="text-sm text-gray-500">Account</p>
+            <p className="text-sm text-gray-500">
+              Account
+            </p>
+
             <h2 className="text-xl font-bold mt-2">
               Active
             </h2>
+
             <p className="text-sm mt-2 text-gray-500">
               You are successfully logged in.
             </p>
           </div>
 
+          {/* Email Address */}
           <div
             className={`p-6 rounded-2xl shadow ${
               darkMode ? "bg-gray-900" : "bg-white"
             }`}
           >
-            <p className="text-sm text-gray-500">Email Address</p>
+            <p className="text-sm text-gray-500">
+              Email Address
+            </p>
+
             <h2 className="text-lg font-bold mt-2 break-all">
               {user.email || "Not available"}
             </h2>
+
             <p className="text-sm mt-2 text-gray-500">
               Your registered email.
             </p>
