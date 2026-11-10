@@ -12,6 +12,8 @@ import Settings from "./pages/Settings"
 import MockTests from "./pages/MockTests"
 import Performance from "./pages/Performance"
 import AIInterview from "./pages/AIInterview"
+import Bookmarks from "./pages/Bookmarks"
+import Roadmap from "./pages/Roadmap"
 
 
 function App() {
@@ -30,6 +32,8 @@ function App() {
         <Route path="/mock-tests" element={<MockTests/>} />
         <Route path="/performance" element={<Performance/>} />
         <Route path="/ai-interview" element={<AIInterview/>} />
+        <Route path="/bookmarks" element={<Bookmarks/>} />
+        <Route path="/roadmap" element={<Roadmap/>} />
       </Routes>
     </BrowserRouter>
   )
