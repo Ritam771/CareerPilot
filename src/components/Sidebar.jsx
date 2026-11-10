@@ -1,5 +1,6 @@
-import React from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { logoutUser } from "../services/auth"
+import { useTheme } from "../context/ThemeContext"
 
 import {
   FiCompass,
@@ -17,7 +18,14 @@ import {
 } from "react-icons/fi"
 
 
-const Sidebar = ({ darkMode }) => {
+const Sidebar = () => {
+  const { darkMode } = useTheme()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logoutUser()
+    navigate("/", { replace: true })
+  }
 
   return (
 
@@ -57,14 +65,22 @@ const Sidebar = ({ darkMode }) => {
 
         {/* Dashboard */}
 
-        <li className="flex items-center gap-3 px-3 py-2 rounded-md bg-blue-900 text-white text-xs cursor-pointer">
-
-          <FiCompass />
-
-          <span>
-            Dashboard
-          </span>
-
+        <li>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
+                isActive
+                  ? "bg-blue-900 text-white"
+                  : darkMode
+                    ? "text-gray-300 hover:bg-gray-700"
+                    : "text-gray-700 hover:bg-gray-100"
+              }`
+            }
+          >
+            <FiCompass />
+            <span>Dashboard</span>
+          </NavLink>
         </li>
 
 
@@ -304,6 +320,7 @@ const Sidebar = ({ darkMode }) => {
         {/* Logout */}
 
         <div
+          onClick={handleLogout}
           className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
             darkMode
               ? "text-red-400 hover:bg-red-950"

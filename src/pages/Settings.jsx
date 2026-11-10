@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 const defaultSettings = {
   theme: "light",
@@ -22,6 +23,7 @@ const sections = [
 ];
 
 function Settings() {
+  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState("Appearance");
   const [settings, setSettings] = useState(defaultSettings);
 
@@ -86,13 +88,14 @@ function Settings() {
               </label>
 
               <select
-                value={settings.theme}
-                onChange={(e) =>
+                value={theme}
+                onChange={(e) => {
+                  setTheme(e.target.value);
                   setSettings({
                     ...settings,
                     theme: e.target.value,
-                  })
-                }
+                  });
+                }}
                 className="rounded-lg border border-gray-300 p-2"
               >
                 <option value="light">Light</option>
