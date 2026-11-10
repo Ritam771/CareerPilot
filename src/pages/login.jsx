@@ -20,6 +20,7 @@ function Login() {
   const [messageType, setMessageType] = useState("error");
   const [isLoading, setIsLoading] = useState(false);
 
+<<<<<<< HEAD
   const setNotice = (text, type = "error") => {
     setMessage(text);
     setMessageType(type);
@@ -55,6 +56,11 @@ function Login() {
   const inputClass =
     "h-12 w-full rounded-lg border border-[#d6dce2] bg-white pl-11 pr-4 text-sm text-[#26384d] outline-none transition placeholder:text-[#9aa6b2] focus:border-[#0b3b60] focus:ring-2 focus:ring-[#0b3b60]/10";
   const labelClass = "mb-2 block text-sm font-semibold text-[#26384d]";
+=======
+  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+>>>>>>> 6ecb1e16527ca8d674c684bcf2682f3d3539b9bd
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f4f1e9] p-3 sm:p-5">

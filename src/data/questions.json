@@ -1,92 +1,53 @@
+
 [
-    {
-        "id": 1,
-        "question": "Which of the following is an object-oriented programming concept?",
-        "options": [
-            {
-                "id": 101,
-                "text": "Inheritance"
-            },
-            {
-                "id": 102,
-                "text": "Compilation"
-            },
-            {
-                "id": 103,
-                "text": "Execution"
-            },
-            {
-                "id": 104,
-                "text": "Linking"
-            }
-        ]
-    },
-    { 
-         "id": 2,
-         "question": "Which protocol is connection-oriented?",
-         "options": [
-            { 
-                "id": 201,
-                "text": "TCP"
-            },
-            {
-                "id": 202,
-                "text": "UDP"
-            },
-            { 
-                "id": 203,
-                "text": "IP"
-            },
-            {
-                "id": 204,
-                "text": "DNS"
-            }
-         ]
-    },
-    {
-        "id": 3,
-        "question": " Which of  the following is a NoSQL database?",
-        "options" : [
-            {
-                "id":301,
-                "text": "MongoDB"
-            },
-            { 
-                "id":302,
-                "text": "MySQL"
-            },
-            {
-                "id":303,
-                "text":"PostgreSQL"
-            },
-            {
-                "id":304,
-                "text":"Oracle"
-            }
-
-        ]
-    },
-     {
-        "id": 4,
-        "question": "Which of the following is an object-oriented programming concept?",
-        "options": [
-            {
-                "id": 101,
-                "text": "Inheritance"
-            },
-            {
-                "id": 102,
-                "text": "Compilation"
-            },
-            {
-                "id": 103,
-                "text": "Execution"
-            },
-            {
-                "id": 104,
-                "text": "Linking"
-            }
-        ]
-    }
-
+  {
+    "id": 1,
+    "question": "Which of the following is an object-oriented programming concept?",
+    "options": [
+      { "id": 101, "text": "Inheritance" },
+      { "id": 102, "text": "Compilation" },
+      { "id": 103, "text": "Execution" },
+      { "id": 104, "text": "Linking" }
+    ]
+  },
+  {
+    "id": 2,
+    "question": "Which protocol is connection-oriented?",
+    "options": [
+      { "id": 201, "text": "UDP" },
+      { "id": 202, "text": "TCP" },
+      { "id": 203, "text": "IP" },
+      { "id": 204, "text": "DNS" }
+    ]
+  },
+  {
+    "id": 3,
+    "question": "Which of the following is a NoSQL database?",
+    "options": [
+      { "id": 301, "text": "MySQL" },
+      { "id": 302, "text": "MongoDB" },
+      { "id": 303, "text": "PostgreSQL" },
+      { "id": 304, "text": "Oracle" }
+    ]
+  },
+  {
+    "id": 4,
+    "question": "Which data structure follows the LIFO principle?",
+    "options": [
+      { "id": 401, "text": "Queue" },
+      { "id": 402, "text": "Stack" },
+      { "id": 403, "text": "Linked List" },
+      { "id": 404, "text": "Tree" }
+    ]
+  },
+  {
+    "id": 5,
+    "question": "Which SQL command is used to retrieve data from a table?",
+    "options": [
+      { "id": 501, "text": "INSERT" },
+      { "id": 502, "text": "UPDATE" },
+      { "id": 503, "text": "SELECT" },
+      { "id": 504, "text": "DELETE" }
+    ]
+  }
 ]

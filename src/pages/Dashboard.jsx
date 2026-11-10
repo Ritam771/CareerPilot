@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -5,15 +6,26 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { getCurrentUser, logoutUser } from "../services/auth";
 import { useTheme } from "../context/ThemeContext";
+=======
+import { NavLink } from 'react-router-dom'
+import React, { useState } from 'react'
+import Sidebar from '../components/Sidebar'
+>>>>>>> 6ecb1e16527ca8d674c684bcf2682f3d3539b9bd
 
 import {
   FiSun,
   FiMoon,
   FiSearch,
   FiBell,
+<<<<<<< HEAD
   FiUser,
   FiLogOut,
 } from "react-icons/fi";
+=======
+  FiSettings,
+} from 'react-icons/fi'
+
+>>>>>>> 6ecb1e16527ca8d674c684bcf2682f3d3539b9bd
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -120,10 +132,62 @@ const Dashboard = () => {
               )}
             </button>
 
+<<<<<<< HEAD
             {/* Profile */}
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
                 {getInitials(user.name)}
+=======
+
+            {/* ================= NOTIFICATION ================= */}
+
+            <button
+              type="button"
+              className={`relative w-9 h-9 rounded-full flex items-center justify-center transition ${
+                darkMode
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+
+              <FiBell size={19} />
+
+              {/* Notification Dot */}
+
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+
+            </button>
+             
+             {/* ================= SETTINGS ================= */}
+
+<NavLink
+  to="/settings"
+  title="Settings"
+  className={({ isActive }) =>
+    `w-9 h-9 rounded-full flex items-center justify-center transition ${
+      isActive
+        ? "bg-indigo-100 text-indigo-900"
+        : darkMode
+          ? "text-gray-300 hover:bg-gray-700"
+          : "text-gray-600 hover:bg-gray-100"
+    }`
+  }
+>
+  <FiSettings size={19} />
+</NavLink>
+
+            {/* ================= ACCOUNT ================= */}
+
+            <div className="flex items-center gap-3">
+
+
+              {/* Profile Initials */}
+
+              <div className="w-10 h-10 rounded-full bg-[#312e81] text-white flex items-center justify-center font-semibold text-sm">
+
+                RM
+
+>>>>>>> 6ecb1e16527ca8d674c684bcf2682f3d3539b9bd
               </div>
 
               <div className="hidden sm:block">
