@@ -1,4 +1,3 @@
-
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../services/auth";
 import { useTheme } from "../context/ThemeContext";
@@ -15,7 +14,7 @@ import {
   FiBarChart2,
   FiBookmark,
   FiLogOut,
-  FiMonitor,
+  FiFileText, // Imported for AI Resume Analyzer
 } from "react-icons/fi";
 
 const Sidebar = () => {
@@ -122,15 +121,15 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* AI Interview */}
+        {/* AI Resume Analyzer (Replaced AI Interview) */}
         <li>
-          <NavLink to="/ai-interview" className={navLinkStyles}>
-            <FiMonitor
+          <NavLink to="/ai-resume-analyzer" className={navLinkStyles}>
+            <FiFileText
               className={
                 darkMode ? "text-teal-400" : "text-teal-600"
               }
             />
-            <span>AI Interview</span>
+            <span>AI Resume Analyzer</span>
           </NavLink>
         </li>
 

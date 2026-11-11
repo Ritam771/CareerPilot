@@ -28,7 +28,7 @@ import Settings from "./pages/Settings";
 // Additional CareerPilot Features
 import MockTests from "./pages/MockTests";
 import Performance from "./pages/Performance";
-import AIInterview from "./pages/AIInterview";
+import AIResumeAnalyzer from "./pages/AIResumeAnalyzer";
 import Bookmarks from "./pages/Bookmarks";
 import Roadmap from "./pages/Roadmap";
 
@@ -134,8 +134,8 @@ function App() {
           />
 
           <Route
-            path="/ai-interview"
-            element={<ProtectedRoute><AIInterview /></ProtectedRoute>}
+            path="/ai-resume-analyzer"
+            element={<ProtectedRoute><AIResumeAnalyzer /></ProtectedRoute>}
           />
 
           <Route
