@@ -1,4 +1,3 @@
-
 import {
   BrowserRouter,
   Routes,
@@ -31,6 +30,9 @@ import Performance from "./pages/Performance";
 import AIResumeAnalyzer from "./pages/AIResumeAnalyzer";
 import Bookmarks from "./pages/Bookmarks";
 import Roadmap from "./pages/Roadmap";
+
+// NEW IMPORT: Dynamic Practice Session
+import PracticeSession from "./pages/PracticeSession";
 
 // Protect pages that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -109,6 +111,12 @@ function App() {
           <Route
             path="/company-prep"
             element={<ProtectedRoute><Companyprep /></ProtectedRoute>}
+          />
+          
+          {/* NEW ROUTE: Master Practice Session (handles queries like ?category=TECHNICAL&difficulty=HARD) */}
+          <Route
+            path="/practice"
+            element={<ProtectedRoute><PracticeSession /></ProtectedRoute>}
           />
 
           {/* User Pages */}
