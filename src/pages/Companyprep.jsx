@@ -9,6 +9,9 @@ const CompanyPrep = () => {
   const [companies, setCompanies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // NEW: State to track selected category per company card
+  const [selectedCategories, setSelectedCategories] = useState({});
 
   // Pagination State matching Spring Boot's Page<T> response
   const [page, setPage] = useState(0);
@@ -23,7 +26,7 @@ const CompanyPrep = () => {
         setIsLoading(true);
         setError(null);
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("jwtToken"); // Make sure token key matches your auth
 
         // Verify this URL matches your CompanyController @GetMapping path
         const response = await axios.get("http://localhost:8080/api/company/getallcompany", {
@@ -58,6 +61,14 @@ const CompanyPrep = () => {
     fetchCompanies();
   }, [page]);
 
+  // Handle dropdown changes for a specific company
+  const handleCategoryChange = (companyId, value) => {
+    setSelectedCategories((prev) => ({
+      ...prev,
+      [companyId]: value,
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-8">
       <div className="max-w-7xl mx-auto">
@@ -66,7 +77,7 @@ const CompanyPrep = () => {
         </h1>
 
         <p className="mt-2 text-gray-500">
-          Choose a company to practice its questions.
+          Choose a company and topic to practice its specific questions.
         </p>
 
         {/* Error Message Banner */}
@@ -89,51 +100,73 @@ const CompanyPrep = () => {
         ) : (
           <>
             {/* Company Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
               {Array.isArray(companies) &&
-                companies.map((company) => (
-                  <div
-                    key={company.companyId}
-                    className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col justify-between"
-                  >
-                    {/* Company Logo (or Initials Fallback) + Name */}
-                    <div className="flex items-center gap-4 mb-2">
-                      {company.logoUrl ? (
-                        <img
-                          src={company.logoUrl}
-                          alt={`${company.name} logo`}
-                          className="h-14 w-14 object-contain rounded-md bg-slate-50 p-1"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <div className="h-14 w-14 rounded-lg bg-blue-100 text-blue-700 font-bold text-xl flex items-center justify-center shrink-0">
-                          {company.name?.charAt(0).toUpperCase() || "C"}
-                        </div>
-                      )}
+                companies.map((company) => {
+                  
+                  // Default to 'TECHNICAL' if user hasn't selected anything for this card yet
+                  const currentCategory = selectedCategories[company.companyId] || "TECHNICAL";
 
-                      <h2 className="text-lg font-bold text-slate-900">
-                        {company.name}
-                      </h2>
-                    </div>
-
-                    {/* View Questions Button */}
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/company-prep/${company.companyId}`)}
-                      className="mt-4 w-full rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  return (
+                    <div
+                      key={company.companyId}
+                      className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md flex flex-col justify-between"
                     >
-                      View Questions
-                    </button>
-                  </div>
-                ))}
+                      {/* Company Logo (or Initials Fallback) + Name */}
+                      <div className="flex items-center gap-4 mb-4">
+                        {company.logoUrl ? (
+                          <img
+                            src={company.logoUrl}
+                            alt={`${company.name} logo`}
+                            className="h-14 w-14 object-contain rounded-md bg-slate-50 p-1"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="h-14 w-14 rounded-lg bg-blue-100 text-blue-700 font-bold text-xl flex items-center justify-center shrink-0">
+                            {company.name?.charAt(0).toUpperCase() || "C"}
+                          </div>
+                        )}
+
+                        <h2 className="text-lg font-bold text-slate-900">
+                          {company.name}
+                        </h2>
+                      </div>
+
+                      {/* Dropdown Selection */}
+                      <div className="mb-4">
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Select Topic
+                        </label>
+                        <select
+                          value={currentCategory}
+                          onChange={(e) => handleCategoryChange(company.companyId, e.target.value)}
+                          className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition-colors cursor-pointer"
+                        >
+                          <option value="TECHNICAL">Technical</option>
+                          <option value="APPTITUDE">Aptitude</option>
+                          <option value="REASONING">Reasoning</option>
+                        </select>
+                      </div>
+
+                      {/* View Questions Button */}
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/company-prep/${company.companyId}?category=${currentCategory}`)}
+                        className="mt-auto w-full rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      >
+                        Practice {currentCategory.charAt(0) + currentCategory.slice(1).toLowerCase()}
+                      </button>
+                    </div>
+                  );
+                })}
             </div>
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-center gap-4">
+              <div className="mt-10 flex items-center justify-center gap-4">
                 <button
                   type="button"
                   disabled={isFirst}
