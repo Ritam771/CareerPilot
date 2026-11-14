@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../services/auth";
 import { useTheme } from "../context/ThemeContext";
+import Avatar from "./Avatar"; // Imported the new Avatar component
 
 import {
   FiCompass,
@@ -15,7 +16,7 @@ import {
   FiBookmark,
   FiLogOut,
   FiFileText, 
-  FiShield, // Added for Admin Portal
+  FiShield, 
 } from "react-icons/fi";
 
 const Sidebar = () => {
@@ -23,7 +24,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   // Retrieve the role dynamically from local storage
-  const userRole = localStorage.getItem("userRole");
+  const userRole = localStorage.getItem("userRole") || "USER";
 
   // Handle logout
   const handleLogout = () => {
@@ -172,13 +173,26 @@ const Sidebar = () => {
 
       {/* Bottom Navigation */}
       <div
-        className={`border-t mt-5 pt-3 ${
+        className={`border-t mt-5 pt-3 flex flex-col gap-2 ${
           darkMode ? "border-gray-700" : "border-gray-200"
         }`}
       >
+        {/* User Mini-Profile with Adventurer Avatar */}
+        <div className="flex items-center gap-3 px-3 mb-2 mt-2">
+          <Avatar seed="Ritam Majumdar" size="w-9 h-9" />
+          <div className="flex flex-col">
+            <span className={`text-sm font-bold ${darkMode ? "text-white" : "text-slate-800"}`}>
+              Ritam Majumdar
+            </span>
+            <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
+              {userRole}
+            </span>
+          </div>
+        </div>
+
         {/* DYNAMIC ADMIN LINK: Only renders if userRole is "ADMIN" */}
         {userRole === "ADMIN" && (
-          <div className="mb-2">
+          <div>
             <NavLink to="/admin" className={navLinkStyles}>
               <FiShield className={darkMode ? "text-purple-400" : "text-purple-600"} />
               <span className="font-bold">Admin Portal</span>

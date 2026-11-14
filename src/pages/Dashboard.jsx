@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/Sidebar";
+import Avatar from "../components/Avatar"; // Import the new Avatar component
 import { getCurrentUser, logoutUser } from "../services/auth";
 import { useTheme } from "../context/ThemeContext";
 
@@ -11,16 +11,13 @@ import {
   FiMoon,
   FiSearch,
   FiBell,
-  FiUser,
   FiLogOut,
   FiSettings,
 } from "react-icons/fi";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
   const { darkMode, toggleDarkMode } = useTheme();
-
   const [user, setUser] = useState(null);
 
   // Get currently logged-in user
@@ -39,20 +36,6 @@ const Dashboard = () => {
   const handleLogout = () => {
     logoutUser();
     navigate("/", { replace: true });
-  };
-
-  // Generate profile initials dynamically
-  const getInitials = (name) => {
-    if (!name) return "U";
-
-    return name
-      .trim()
-      .split(" ")
-      .filter(Boolean)
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
   };
 
   if (!user) {
@@ -152,12 +135,14 @@ const Dashboard = () => {
             </button>
 
             {/* User Profile */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 ml-2">
 
-              {/* Profile Initials */}
-              <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
-                {getInitials(user.name)}
-              </div>
+              {/* DiceBear Avatar replacing the initials */}
+              <Avatar 
+                seed={user.name || "User"} 
+                size="w-10 h-10" 
+                className="border-2 border-indigo-500/50 shadow-sm" 
+              />
 
               {/* User Details */}
               <div className="hidden sm:block">
@@ -180,7 +165,7 @@ const Dashboard = () => {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+              className="flex items-center gap-2 px-3 py-2 ml-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
             >
               <FiLogOut size={18} />
               <span className="hidden sm:inline">Logout</span>
@@ -251,4 +236,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
