@@ -14,12 +14,16 @@ import {
   FiBarChart2,
   FiBookmark,
   FiLogOut,
-  FiFileText, // Imported for AI Resume Analyzer
+  FiFileText, 
+  FiShield, // Added for Admin Portal
 } from "react-icons/fi";
 
 const Sidebar = () => {
   const { darkMode } = useTheme();
   const navigate = useNavigate();
+
+  // Retrieve the role dynamically from local storage
+  const userRole = localStorage.getItem("userRole");
 
   // Handle logout
   const handleLogout = () => {
@@ -121,7 +125,7 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* AI Resume Analyzer (Replaced AI Interview) */}
+        {/* AI Resume Analyzer */}
         <li>
           <NavLink to="/ai-resume-analyzer" className={navLinkStyles}>
             <FiFileText
@@ -172,6 +176,16 @@ const Sidebar = () => {
           darkMode ? "border-gray-700" : "border-gray-200"
         }`}
       >
+        {/* DYNAMIC ADMIN LINK: Only renders if userRole is "ADMIN" */}
+        {userRole === "ADMIN" && (
+          <div className="mb-2">
+            <NavLink to="/admin" className={navLinkStyles}>
+              <FiShield className={darkMode ? "text-purple-400" : "text-purple-600"} />
+              <span className="font-bold">Admin Portal</span>
+            </NavLink>
+          </div>
+        )}
+
         {/* Logout */}
         <button
           type="button"

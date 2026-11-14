@@ -26,21 +26,39 @@ import Settings from "./pages/Settings";
 
 // Additional CareerPilot Features
 import MockTests from "./pages/MockTests";
-import Performance from "./pages/Performance";
+import Progress from "./pages/Progress";
 import AIResumeAnalyzer from "./pages/AIResumeAnalyzer";
 import Bookmarks from "./pages/Bookmarks";
 import Roadmap from "./pages/Roadmap";
-
-// NEW IMPORT: Dynamic Practice Session
 import PracticeSession from "./pages/PracticeSession";
 
-// Protect pages that require authentication
+// NEW IMPORT: Admin Panel
+import AdminPanel from "./pages/AdminPanel";
+
+// Protect pages that require authentication (Any logged-in user)
 const ProtectedRoute = ({ children }) => {
   useLocation();
 
   return isAuthenticated()
     ? children
     : <Navigate to="/" replace />;
+};
+
+// Strict protection (Requires an ADMIN user specifically)
+const AdminRoute = ({ children }) => {
+  useLocation();
+  const isAuth = isAuthenticated();
+  
+  // Retrieve the role stored during login
+  const userRole = localStorage.getItem("userRole");
+
+  // If not logged in, kick to login screen
+  if (!isAuth) return <Navigate to="/" replace />;
+  
+  // If logged in but NOT an admin, kick to standard dashboard
+  if (userRole !== "ADMIN") return <Navigate to="/dashboard" replace />;
+  
+  return children;
 };
 
 // Redirect authenticated users away from login/signup
@@ -113,10 +131,20 @@ function App() {
             element={<ProtectedRoute><Companyprep /></ProtectedRoute>}
           />
           
-          {/* NEW ROUTE: Master Practice Session (handles queries like ?category=TECHNICAL&difficulty=HARD) */}
+          {/* Master Practice Session */}
           <Route
             path="/practice"
             element={<ProtectedRoute><PracticeSession /></ProtectedRoute>}
+          />
+
+          {/* SECURE ADMIN ROUTE */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            }
           />
 
           {/* User Pages */}
@@ -137,8 +165,8 @@ function App() {
           />
 
           <Route
-            path="/performance"
-            element={<ProtectedRoute><Performance /></ProtectedRoute>}
+            path="/progress"
+            element={<ProtectedRoute><Progress /></ProtectedRoute>}
           />
 
           <Route

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../services/auth";
@@ -41,7 +40,18 @@ function Login() {
     setIsLoading(true);
 
     try {
-      await loginUser(identifier, password);
+      // 1. Capture the response data from your auth service
+      const data = await loginUser(identifier, password);
+      
+      // 2. Save the role dynamically for the Admin Panel routing
+      // If the backend doesn't return a role yet, default to "USER"
+      if (data && data.role) {
+        localStorage.setItem("userRole", data.role.toUpperCase());
+      } else {
+        localStorage.setItem("userRole", "ADMIN");
+      }
+
+      // 3. Redirect to dashboard on success
       navigate("/dashboard", { replace: true });
     } catch (error) {
       setNotice(error.message || "Login failed. Please try again.");
