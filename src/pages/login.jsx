@@ -6,11 +6,19 @@ import {
   FiLock,
   FiEye,
   FiEyeOff,
-  FiCompass,
-  FiMap,
-  FiBookOpen,
   FiMail,
+  FiTarget,
+  FiBarChart2,
+  FiCompass,
+  FiArrowRight,
+  FiAlertCircle,
 } from "react-icons/fi";
+
+const highlights = [
+  { icon: FiTarget, title: "Company-specific prep", text: "Practice the questions each recruiter actually asks." },
+  { icon: FiBarChart2, title: "Mock tests with analysis", text: "See exactly which topics cost you marks." },
+  { icon: FiCompass, title: "A plan that adapts", text: "Recommendations change as your scores improve." },
+];
 
 function Login() {
   const navigate = useNavigate();
@@ -27,18 +35,16 @@ function Login() {
     setMessageType(type);
   };
 
-  // Handle Login
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage("");
 
     if (!identifier.trim() || !password) {
-      setNotice("Please enter your email/phone and password.");
+      setNotice("Enter your email or phone number and your password.");
       return;
     }
 
     setIsLoading(true);
-
     try {
       // 1. Capture the response data from your auth service
       const data = await loginUser(identifier, password);
@@ -54,230 +60,168 @@ function Login() {
       // 3. Redirect to dashboard on success
       navigate("/dashboard", { replace: true });
     } catch (error) {
-      setNotice(error.message || "Login failed. Please try again.");
+      setNotice(error.message || "Login failed. Check your details and try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Forgot Password
   const handleForgotPassword = () => {
     setNotice(
-      "Password reset needs an email service or backend. For this frontend demo, create a new account if needed.",
+      "Password reset needs an email service or backend. For this frontend demo, create a new account instead.",
       "info"
     );
   };
 
   const inputClass =
-    "h-12 w-full rounded-lg border border-[#d6dce2] bg-white pl-11 pr-4 text-sm text-[#26384d] outline-none transition placeholder:text-[#9aa6b2] focus:border-[#0b3b60] focus:ring-2 focus:ring-[#0b3b60]/10";
-
-  const labelClass =
-    "mb-2 block text-sm font-semibold text-[#26384d]";
+    "peer h-12 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-teal-600 focus:ring-4 focus:ring-teal-600/15";
+  const iconClass =
+    "pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition peer-focus:text-teal-600";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f4f1e9] p-3 sm:p-5">
-      <div className="flex w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl lg:min-h-[720px] lg:flex-row">
+    <div className="flex min-h-screen bg-white">
+      {/* Left: brand panel */}
+      <section className="relative hidden w-[52%] overflow-hidden bg-[#0A1B2E] lg:flex">
+        <img
+          src="/Mountain.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-50"
+          onError={(e) => (e.currentTarget.style.display = "none")}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1B2E] via-[#0A1B2E]/70 to-[#0A1B2E]/30" />
 
-        {/* Left Visual Panel */}
-        <section className="relative min-h-[260px] overflow-hidden sm:min-h-[320px] lg:min-h-[720px] lg:w-1/2">
+        <div className="relative z-10 flex w-full flex-col justify-between p-12 xl:p-16">
           <img
-            src="/Mountain.png"
-            alt="Mountain landscape"
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(event) => {
-              event.currentTarget.style.display = "none";
-            }}
+            src="/logo.png"
+            alt="CareerPilot"
+            className="h-10 w-auto self-start"
+            onError={(e) => (e.currentTarget.style.display = "none")}
           />
 
-          <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/20 to-[#061f32]/85" />
+          <div>
+            <h2 className="max-w-md text-4xl font-semibold leading-tight tracking-tight text-white xl:text-5xl">
+              Your next offer starts with today’s practice.
+            </h2>
 
-          <div className="absolute left-1/2 top-7 z-10 w-full -translate-x-1/2 text-center sm:top-10">
-            <img
-              src="/logo.png"
-              alt="CareerPilot"
-              className="mx-auto h-auto w-40 sm:w-52"
-              onError={(event) => {
-                event.currentTarget.style.display = "none";
-              }}
-            />
+            <ul className="mt-10 max-w-md space-y-5">
+              {highlights.map(({ icon: Icon, title, text }) => (
+                <li key={title} className="flex gap-4">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-amber-300 ring-1 ring-white/15 backdrop-blur">
+                    <Icon size={19} />
+                  </span>
+                  <div>
+                    <p className="font-medium text-white">{title}</p>
+                    <p className="mt-0.5 text-sm leading-relaxed text-slate-300">{text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
 
-            <p className="mt-2 text-xs font-medium tracking-[0.2em] text-white/90 sm:text-sm">
-              NAVIGATE YOUR CAREER
-            </p>
+      {/* Right: form */}
+      <section className="flex flex-1 items-center justify-center bg-slate-50 px-5 py-10 sm:px-10">
+        <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-900/5 sm:p-10">
+          <div className="mb-8">
+            <span className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-teal-700 text-white lg:hidden">
+              <FiCompass size={20} />
+            </span>
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Welcome back</h1>
+            <p className="mt-2 text-sm text-slate-500">Log in to pick up where you left off.</p>
           </div>
 
-          <div className="absolute bottom-6 left-6 z-10 hidden space-y-4 text-white sm:block sm:bottom-9 sm:left-9">
-
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-[#0b5575]/80">
-                <FiCompass size={18} />
-              </span>
-              <p className="text-sm font-medium">
-                Company Specific Preparation
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-[#0b5575]/80">
-                <FiMap size={18} />
-              </span>
-              <p className="text-sm font-medium">
-                Mock Tests &amp; Performance Analysis
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-[#0b5575]/80">
-                <FiBookOpen size={18} />
-              </span>
-              <p className="text-sm font-medium">
-                Personalized Learning Recommendations
-              </p>
-            </div>
-
-          </div>
-        </section>
-
-        {/* Right Form Panel */}
-        <section className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#faf8f2] px-5 py-9 sm:px-10 lg:w-1/2 lg:px-12">
-
-          <div className="navigation-pattern absolute inset-0" />
-
-          <div className="relative z-10 w-full max-w-md">
-
-            <header className="mb-7 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#062f50] text-white shadow-md">
-                <FiCompass size={22} />
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
+            <div>
+              <label htmlFor="identifier" className="mb-2 block text-sm font-medium text-slate-700">
+                Email or phone number
+              </label>
+              <div className="relative">
+                <input
+                  id="identifier"
+                  type="text"
+                  autoComplete="username"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="you@example.com"
+                  className={inputClass}
+                />
+                <FiMail className={iconClass} size={17} />
               </div>
+            </div>
 
-              <h1 className="text-3xl font-bold text-[#0b2440]">
-                Welcome Back!
-              </h1>
-
-              <p className="mt-2 text-sm text-[#526174]">
-                Login to continue your placement journey
-              </p>
-            </header>
-
-            <form onSubmit={handleSubmit} noValidate>
-
-              {/* Email / Phone */}
-              <div className="mb-5">
-                <label htmlFor="identifier" className={labelClass}>
-                  Email / Phone
-                </label>
-
-                <div className="relative">
-                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#536579]" size={17} />
-
-                  <input
-                    id="identifier"
-                    type="text"
-                    autoComplete="username"
-                    value={identifier}
-                    onChange={(event) => setIdentifier(event.target.value)}
-                    placeholder="Enter your email or phone number"
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div className="mb-5">
-                <label htmlFor="password" className={labelClass}>
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium text-slate-700">
                   Password
                 </label>
-
-                <div className="relative">
-                  <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#536579]" size={17} />
-
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    placeholder="Enter your password"
-                    className={`${inputClass} pr-12`}
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((visible) => !visible)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#536579] hover:text-[#0b3b60]"
-                  >
-                    {showPassword ? (
-                      <FiEyeOff size={17} />
-                    ) : (
-                      <FiEye size={17} />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Forgot Password */}
-              <div className="mb-6 flex justify-end">
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="text-xs font-semibold text-blue-600 hover:underline"
+                  className="text-xs font-medium text-teal-700 hover:underline"
                 >
-                  Forgot Password?
+                  Forgot password?
                 </button>
               </div>
-
-              {/* Messages */}
-              {message && (
-                <div
-                  role="alert"
-                  aria-live="polite"
-                  className={`mb-5 rounded-lg border px-3 py-3 text-sm ${
-                    messageType === "info"
-                      ? "border-blue-200 bg-blue-50 text-blue-800"
-                      : "border-red-200 bg-red-50 text-red-700"
-                  }`}
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className={`${inputClass} pr-12`}
+                />
+                <FiLock className={iconClass} size={17} />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-teal-700"
                 >
-                  {message}
-                </div>
-              )}
+                  {showPassword ? <FiEyeOff size={17} /> : <FiEye size={17} />}
+                </button>
+              </div>
+            </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#062f50] font-semibold text-white transition hover:bg-[#041f36] focus:outline-none focus:ring-2 focus:ring-[#0b3b60] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            {message && (
+              <div
+                role="alert"
+                aria-live="polite"
+                className={`flex gap-2 rounded-xl border px-3.5 py-3 text-sm ${
+                  messageType === "info"
+                    ? "border-sky-200 bg-sky-50 text-sky-800"
+                    : "border-red-200 bg-red-50 text-red-700"
+                }`}
               >
-                <span>
-                  {isLoading ? "Logging in..." : "Login"}
-                </span>
+                <FiAlertCircle className="mt-0.5 shrink-0" size={16} />
+                <span>{message}</span>
+              </div>
+            )}
 
-                <span className="text-lg" aria-hidden="true">
-                  →
-                </span>
-              </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-700 font-semibold text-white shadow-lg shadow-teal-700/25 transition hover:bg-teal-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-600/30 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isLoading ? "Logging in…" : "Log in"}
+              {!isLoading && <FiArrowRight className="transition group-hover:translate-x-0.5" size={18} />}
+            </button>
+          </form>
 
-            </form>
+          <p className="mt-8 text-center text-sm text-slate-500">
+            New to CareerPilot?
+            <Link to="/signin" className="ml-1 font-semibold text-teal-700 hover:underline">
+              Create an account
+            </Link>
+          </p>
 
-            <p className="mt-8 text-center text-sm text-gray-500">
-              Don't have an account?
-
-              <Link
-                to="/signin"
-                className="ml-1 font-semibold text-blue-600 hover:underline"
-              >
-                Sign up
-              </Link>
-            </p>
-
-            <p className="mt-6 text-center text-xs leading-5 text-[#7b8794]">
-              Frontend demo: accounts are saved only in this browser.
-              Connect Spring Boot before using real student accounts.
-            </p>
-
-          </div>
-        </section>
-      </div>
+          <p className="mt-6 text-center text-xs leading-5 text-slate-400">
+            Frontend demo: accounts are saved only in this browser. Connect Spring Boot before using real student accounts.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
