@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/Sidebar";
-import Avatar from "../components/Avatar"; // Import the new Avatar component
+import Avatar from "../components/Avatar";
 import { getCurrentUser, logoutUser } from "../services/auth";
 import { useTheme } from "../context/ThemeContext";
 
@@ -13,14 +13,24 @@ import {
   FiBell,
   FiLogOut,
   FiSettings,
+  FiAward,
+  FiTrendingUp,
+  FiBriefcase
 } from "react-icons/fi";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode } = useTheme();
   const [user, setUser] = useState(null);
+  
+  // State for dynamic dashboard metrics
+  const [profileStats, setProfileStats] = useState({
+    course: "Not specified",
+    skillsCount: 0,
+    internshipsCount: 0,
+  });
 
-  // Get currently logged-in user
+  // Get currently logged-in user and their profile stats
   useEffect(() => {
     const currentUser = getCurrentUser();
 
@@ -30,6 +40,21 @@ const Dashboard = () => {
     }
 
     setUser(currentUser);
+
+    // Fetch dynamic stats from the local profile data
+    try {
+      const savedProfile = localStorage.getItem("careerPilotProfile");
+      if (savedProfile) {
+        const data = JSON.parse(savedProfile);
+        setProfileStats({
+          course: data.currentCourse || "Not specified",
+          skillsCount: data.skills ? data.skills.length : 0,
+          internshipsCount: data.internships ? data.internships.length : 0,
+        });
+      }
+    } catch (error) {
+      console.error("Could not load profile stats", error);
+    }
   }, [navigate]);
 
   // Logout handler
@@ -38,9 +63,19 @@ const Dashboard = () => {
     navigate("/", { replace: true });
   };
 
+  // Dynamic time-based greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
   if (!user) {
     return null;
   }
+
+  const userRole = localStorage.getItem("userRole") || "USER";
 
   return (
     <div
@@ -59,10 +94,10 @@ const Dashboard = () => {
         {/* Header */}
         <header className="flex flex-wrap items-center justify-between gap-4 mb-8">
 
-          {/* Greeting */}
+          {/* Dynamic Greeting */}
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">
-              Welcome back, {user.name || "User"}!
+              {getGreeting()}, {user.name || "User"}!
             </h1>
 
             <p
@@ -70,7 +105,7 @@ const Dashboard = () => {
                 darkMode ? "text-gray-400" : "text-gray-500"
               }`}
             >
-              Here's what's happening with your account today.
+              Here's your CareerPilot progress for today.
             </p>
           </div>
 
@@ -97,16 +132,12 @@ const Dashboard = () => {
               }`}
             >
               <FiBell size={19} />
-
-              {/* Notification Indicator */}
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
             </button>
 
             {/* Settings */}
             <NavLink
               to="/settings"
-              title="Settings"
-              aria-label="Settings"
               className={({ isActive }) =>
                 `w-9 h-9 rounded-full flex items-center justify-center transition ${
                   isActive
@@ -125,111 +156,106 @@ const Dashboard = () => {
               type="button"
               onClick={toggleDarkMode}
               className="p-3 rounded-xl hover:bg-gray-500/10"
-              aria-label="Toggle dark mode"
             >
-              {darkMode ? (
-                <FiSun size={20} />
-              ) : (
-                <FiMoon size={20} />
-              )}
+              {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
             </button>
 
             {/* User Profile */}
             <div className="flex items-center gap-3 ml-2">
-
-              {/* DiceBear Avatar replacing the initials */}
               <Avatar 
                 seed={user.name || "User"} 
                 size="w-10 h-10" 
                 className="border-2 border-indigo-500/50 shadow-sm" 
               />
-
-              {/* User Details */}
               <div className="hidden sm:block">
-                <p className="text-sm font-semibold">
+                <p className="text-sm font-semibold truncate max-w-[150px]">
                   {user.name || "User"}
                 </p>
-
                 <p
-                  className={`text-xs ${
+                  className={`text-xs truncate max-w-[150px] ${
                     darkMode ? "text-gray-400" : "text-gray-500"
                   }`}
                 >
                   {user.email || ""}
                 </p>
               </div>
-
             </div>
 
             {/* Logout */}
             <button
               type="button"
               onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-2 ml-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+              className="flex items-center gap-2 px-3 py-2 ml-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition shadow-sm"
             >
               <FiLogOut size={18} />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline font-medium">Logout</span>
             </button>
 
           </div>
         </header>
 
-        {/* Dashboard Content */}
+        {/* Dynamic Dashboard Cards */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-          {/* Welcome Card */}
-          <div className="p-6 rounded-2xl bg-indigo-600 text-white shadow">
-            <p className="text-sm opacity-80">Welcome</p>
+          {/* Card 1: Identity & Role */}
+          <div className="p-6 rounded-2xl bg-indigo-600 text-white shadow-md flex flex-col justify-between relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 text-indigo-200 mb-2">
+                <FiAward size={18} />
+                <span className="text-sm font-semibold tracking-wide uppercase">{userRole} ACCOUNT</span>
+              </div>
+              <h2 className="text-2xl font-bold mt-1 truncate">
+                {user.name || "User"}
+              </h2>
+              <p className="text-sm mt-2 text-indigo-100">
+                {profileStats.course}
+              </p>
+            </div>
+            {/* Decorative background element */}
+            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+          </div>
 
-            <h2 className="text-2xl font-bold mt-2">
-              {user.name || "User"}
-            </h2>
-
-            <p className="text-sm mt-2 opacity-80">
-              Your dashboard is ready.
+          {/* Card 2: Technical Skills */}
+          <div
+            className={`p-6 rounded-2xl shadow-md border flex flex-col justify-between ${
+              darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
+            }`}
+          >
+            <div>
+              <div className="flex items-center gap-2 text-emerald-500 mb-2">
+                <FiTrendingUp size={18} />
+                <span className="text-sm font-semibold tracking-wide uppercase">Skill Stack</span>
+              </div>
+              <h2 className={`text-3xl font-bold mt-1 ${darkMode ? "text-white" : "text-slate-800"}`}>
+                {profileStats.skillsCount}
+              </h2>
+            </div>
+            <p className={`text-sm mt-3 font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+              Registered technical skills
             </p>
           </div>
 
-          {/* Account Status */}
+          {/* Card 3: Experience */}
           <div
-            className={`p-6 rounded-2xl shadow ${
-              darkMode ? "bg-gray-900" : "bg-white"
+            className={`p-6 rounded-2xl shadow-md border flex flex-col justify-between ${
+              darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
             }`}
           >
-            <p className="text-sm text-gray-500">
-              Account
-            </p>
-
-            <h2 className="text-xl font-bold mt-2">
-              Active
-            </h2>
-
-            <p className="text-sm mt-2 text-gray-500">
-              You are successfully logged in.
-            </p>
-          </div>
-
-          {/* Email Address */}
-          <div
-            className={`p-6 rounded-2xl shadow ${
-              darkMode ? "bg-gray-900" : "bg-white"
-            }`}
-          >
-            <p className="text-sm text-gray-500">
-              Email Address
-            </p>
-
-            <h2 className="text-lg font-bold mt-2 break-all">
-              {user.email || "Not available"}
-            </h2>
-
-            <p className="text-sm mt-2 text-gray-500">
-              Your registered email.
+            <div>
+              <div className="flex items-center gap-2 text-blue-500 mb-2">
+                <FiBriefcase size={18} />
+                <span className="text-sm font-semibold tracking-wide uppercase">Experience</span>
+              </div>
+              <h2 className={`text-3xl font-bold mt-1 ${darkMode ? "text-white" : "text-slate-800"}`}>
+                {profileStats.internshipsCount}
+              </h2>
+            </div>
+            <p className={`text-sm mt-3 font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+              Internships added to profile
             </p>
           </div>
 
         </section>
-
       </main>
     </div>
   );
