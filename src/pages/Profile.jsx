@@ -1,5 +1,7 @@
-
+import Avatar from "../components/Avatar";
 import { useEffect, useRef, useState } from "react";
+import { getCurrentUser } from "../services/auth"; // IMPORT AUTH SERVICE
+
 const colleges = [
   "Techno India University",
   "University of Engineering and Management (UEM), Kolkata",
@@ -63,6 +65,7 @@ const colleges = [
   "Patna University",
   "IIT Patna",
 ];
+
 const courses = [
   "BCA",
   "BBA",
@@ -72,6 +75,7 @@ const courses = [
   "M.Tech",
   "Other",
 ];
+
 const degreeOptions = [
   "BCA",
   "BBA",
@@ -82,6 +86,7 @@ const degreeOptions = [
   "BA",
   "Other",
 ];
+
 const inputClass =
   "w-full rounded-lg border border-slate-300 bg-white p-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
 const labelClass =
@@ -90,6 +95,7 @@ const sectionClass =
   "mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm";
 const RESUME_DB_NAME = "CareerPilotResumeDB";
 const RESUME_STORE_NAME = "resumes";
+
 const openResumeDB = () => new Promise((resolve, reject) => {
   const request = indexedDB.open(RESUME_DB_NAME, 1);
   request.onupgradeneeded = () => {
@@ -119,6 +125,7 @@ const getResumeFile = () => resumeTransaction("readonly", (store, resolve, rejec
 const deleteResumeFile = () => resumeTransaction("readwrite", (store) => store.delete("currentResume"));
 
 const Profile = () => {
+  const [user, setUser] = useState(null); // ADDED USER STATE
   const [photo, setPhoto] = useState("");
   const [currentCourse, setCurrentCourse] = useState("");
   const [skills, setSkills] = useState([
@@ -134,6 +141,15 @@ const Profile = () => {
   const [message, setMessage] = useState("");
   const formRef = useRef(null);
   const resumeInputRef = useRef(null);
+
+  // LOAD USER DETAILS
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
+    }
+  }, []);
+
   useEffect(() => {
     const savedProfile = localStorage.getItem(
       "careerPilotProfile"
@@ -157,6 +173,7 @@ const Profile = () => {
       console.error("Could not load the saved profile.");
     }
   }, []);
+
   useEffect(() => {
     let cancelled = false;
     const loadResume = async () => {
@@ -175,6 +192,7 @@ const Profile = () => {
       cancelled = true;
     };
   }, []);
+
   useEffect(() => {
     return () => {
       if (resumeUrl) {
@@ -182,6 +200,7 @@ const Profile = () => {
       }
     };
   }, [resumeUrl]);
+
   const addSkill = () => {
     const newSkill = skillInput.trim();
     if (
@@ -194,11 +213,13 @@ const Profile = () => {
       setSkillInput("");
     }
   };
+
   const removeSkill = (skillToRemove) => {
     setSkills(
       skills.filter((skill) => skill !== skillToRemove)
     );
   };
+
   const addInternship = () => {
     setInternships([
       ...internships,
@@ -211,6 +232,7 @@ const Profile = () => {
       },
     ]);
   };
+
   const updateInternship = (id, field, value) => {
     setInternships(
       internships.map((internship) =>
@@ -220,11 +242,13 @@ const Profile = () => {
       )
     );
   };
+
   const removeInternship = (id) => {
     setInternships(
       internships.filter((internship) => internship.id !== id)
     );
   };
+
   const handlePhotoChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -244,6 +268,7 @@ const Profile = () => {
     };
     reader.readAsDataURL(file);
   };
+
   const handleSave = (event) => {
     event.preventDefault();
     const formData = new FormData(formRef.current);
@@ -267,6 +292,7 @@ const Profile = () => {
       );
     }
   };
+
   const handleResumeChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -294,6 +320,7 @@ const Profile = () => {
     }
     event.target.value = "";
   };
+
   const handleRemoveResume = async () => {
     try {
       await deleteResumeFile();
@@ -305,12 +332,14 @@ const Profile = () => {
       setMessage("Could not remove your resume. Please try again.");
     }
   };
+
   const isPostgraduate = ["MCA", "MBA", "M.Tech"].includes(
     currentCourse
   );
   const isUndergraduate = ["BCA", "BBA", "B.Tech"].includes(
     currentCourse
   );
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-6">
       <h1 className="text-3xl font-bold text-slate-900">
@@ -321,25 +350,32 @@ const Profile = () => {
       </p>
       <form ref={formRef} onSubmit={handleSave}>
         <div className={sectionClass}>
+          
+          {/* PROFILE AVATAR SECTION */}
           <div className="flex flex-col items-center gap-3">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-slate-500">
-              {photo ? (
+            {photo ? (
+              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-slate-200 shadow-sm">
                 <img
                   src={photo}
                   alt="Profile"
                   className="h-full w-full object-cover"
                 />
-              ) : (
-                <span className="text-4xl">👤</span>
-              )}
-            </div>
+              </div>
+            ) : (
+              <Avatar 
+                seed={user?.name || "User"} 
+                size="w-24 h-24" 
+                className="border-4 border-slate-200 shadow-sm"
+              />
+            )}
+            
             <h2 className="text-xl font-semibold text-slate-800">
-              Your Name
+              {user?.name || "Your Name"}
             </h2>
             <p className="text-sm text-slate-500">
               Add a short introduction below.
             </p>
-            <label className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+            <label className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 mt-2">
               Change Photo
               <input
                 type="file"
@@ -356,6 +392,7 @@ const Profile = () => {
               Remove Photo
             </button>
           </div>
+
         </div>
         
         <div className={sectionClass}>
@@ -1073,4 +1110,5 @@ const Profile = () => {
     </div>
   );
 };
+
 export default Profile;

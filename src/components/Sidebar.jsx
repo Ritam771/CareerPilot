@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { logoutUser } from "../services/auth";
+import { logoutUser, getCurrentUser } from "../services/auth"; // Imported getCurrentUser
 import { useTheme } from "../context/ThemeContext";
-import Avatar from "./Avatar"; // Imported the new Avatar component
+import Avatar from "./Avatar"; 
 
 import {
   FiCompass,
@@ -22,6 +23,14 @@ import {
 const Sidebar = () => {
   const { darkMode } = useTheme();
   const navigate = useNavigate();
+
+  // State to hold the current user
+  const [user, setUser] = useState(null);
+
+  // Fetch the current user when the sidebar loads
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
 
   // Retrieve the role dynamically from local storage
   const userRole = localStorage.getItem("userRole") || "USER";
@@ -177,12 +186,14 @@ const Sidebar = () => {
           darkMode ? "border-gray-700" : "border-gray-200"
         }`}
       >
-        {/* User Mini-Profile with Adventurer Avatar */}
+        {/* User Mini-Profile with Dynamic Adventurer Avatar */}
         <div className="flex items-center gap-3 px-3 mb-2 mt-2">
-          <Avatar seed="Ritam Majumdar" size="w-9 h-9" />
-          <div className="flex flex-col">
-            <span className={`text-sm font-bold ${darkMode ? "text-white" : "text-slate-800"}`}>
-              Ritam Majumdar
+          {/* Dynamically pass the user's name as the seed */}
+          <Avatar seed={user?.name || "User"} size="w-9 h-9" />
+          <div className="flex flex-col overflow-hidden">
+            {/* Dynamically display the user's name and truncate if it's too long */}
+            <span className={`text-sm font-bold truncate ${darkMode ? "text-white" : "text-slate-800"}`}>
+              {user?.name || "User"}
             </span>
             <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
               {userRole}
