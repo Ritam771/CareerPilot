@@ -81,7 +81,7 @@ const Dashboard = () => {
     <div
       className={`flex min-h-screen transition-colors duration-300 ${
         darkMode
-          ? "bg-gray-950 text-white"
+        ? "bg-gray-950 text-white"
           : "bg-gray-100 text-gray-900"
       }`}
     >
