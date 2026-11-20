@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiGrid, FiFileText, FiBriefcase, FiPlus } from "react-icons/fi";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // State for companies fetched from the backend
+  const [companies, setCompanies] = useState([]);
 
   // Form State with updated default company
   const [questionForm, setQuestionForm] = useState({
@@ -24,6 +27,30 @@ const AdminPanel = () => {
     logoUrl: ""
   });
 
+  // --- Fetch Companies from Backend ---
+  const fetchCompanies = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const response = await fetch("http://localhost:8080/api/admin/companies", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch companies.");
+      const data = await response.json();
+      setCompanies(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching companies:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
   // --- API Handlers ---
   const handleAddQuestion = async (e) => {
     e.preventDefault();
@@ -41,7 +68,7 @@ const AdminPanel = () => {
     const payload = {
       category: questionForm.category,
       difficulty: questionForm.difficulty,
-      company: questionForm.company,
+      company: questionForm.company === "NONE" ? null : questionForm.company,
       questionText: questionForm.questionText,
       options: formattedOptions,
       correctOption: questionForm.correctOption
@@ -97,6 +124,7 @@ const AdminPanel = () => {
       
       setStatusMessage("✅ Company added successfully!");
       setCompanyForm({ name: "", logoUrl: "" });
+      fetchCompanies(); // Refresh dropdown list immediately
     } catch (error) {
       setStatusMessage(`❌ Error: ${error.message}`);
     } finally {
@@ -207,12 +235,11 @@ const AdminPanel = () => {
                       className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
                     >
                       <option value="NONE">None</option>
-                      <option value="TCS">TCS</option>
-                      <option value="WIPRO">Wipro</option>
-                      <option value="CAPGEMINI">Capgemini</option>
-                      <option value="COGNIZANT">Cognizant</option>
-                      <option value="ACCENTURE">Accenture</option>
-                      <option value="DELOITTE">Deloitte</option>
+                      {companies.map((comp) => (
+                        <option key={comp.id || comp.name} value={comp.name}>
+                          {comp.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
