@@ -10,7 +10,7 @@ const AdminPanel = () => {
   const [questionForm, setQuestionForm] = useState({
     category: "TECHNICAL",
     difficulty: "MEDIUM",
-    company: "TCS",
+    company: "NONE",
     questionText: "",
     optionA: "",
     optionB: "",
@@ -206,6 +206,7 @@ const AdminPanel = () => {
                       onChange={(e) => setQuestionForm({...questionForm, company: e.target.value})}
                       className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
                     >
+                      <option value="NONE">None</option>
                       <option value="TCS">TCS</option>
                       <option value="WIPRO">Wipro</option>
                       <option value="CAPGEMINI">Capgemini</option>
