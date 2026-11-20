@@ -95,33 +95,31 @@ const AIResumeAnalyzer = () => {
       fileInputRef.current.value = "";
     }
   };
-  {errorMessage && (
-  <p className="mt-2 text-sm text-red-500">{errorMessage}</p>
-)}
+
   return (
     <div className="flex h-screen bg-[#0f172a] text-white p-6 gap-6 font-sans w-full overflow-hidden">
       
       {/* ================= LEFT COLUMN: UPLOAD & FORM ================= */}
       <div className="w-1/3 flex flex-col gap-5 shrink-0 h-full overflow-y-auto pb-6 pr-2 custom-scrollbar">
         
-        <div>
+        <div className="shrink-0">
           <h1 className="text-3xl font-bold mb-2">AI Resume Analyzer</h1>
           <p className="text-gray-400 text-sm">
             Optimize your resume for ATS and get tailored keyword insights against your target role.
           </p>
         </div>
 
-        <div className="bg-[#1e293b] rounded-2xl border border-gray-700/60 p-6 flex flex-col relative overflow-hidden shadow-lg">
+        <div className="bg-[#1e293b] rounded-2xl border border-gray-700/60 p-5 flex flex-col shrink-0 relative shadow-lg">
           
           {/* Section 1: Resume Upload */}
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+          <div className="mb-5">
+            <h3 className="text-sm font-semibold text-gray-300 mb-2.5 flex items-center gap-2">
               <FiFileText className="text-teal-400" /> Step 1: Upload Resume
             </h3>
             
             <div 
               onClick={() => !isAnalyzing && fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 flex flex-col items-center justify-center min-h-[140px] ${
+              className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 flex flex-col items-center justify-center min-h-[120px] ${
                 isAnalyzing ? 'border-gray-700 bg-gray-800/50 cursor-not-allowed opacity-70' :
                 resumeFile ? 'border-teal-500/50 bg-teal-900/10 cursor-pointer hover:bg-teal-900/20' : 
                 'border-gray-600 bg-[#0f172a] cursor-pointer hover:border-teal-400/50 hover:bg-[#162137]'
@@ -155,8 +153,8 @@ const AIResumeAnalyzer = () => {
           </div>
 
           {/* Section 2: Job Description */}
-          <div className="mb-8">
-            <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+          <div className="mb-5">
+            <h3 className="text-sm font-semibold text-gray-300 mb-2.5 flex items-center gap-2">
               <FiBriefcase className="text-blue-400" /> Step 2: Target Job (Optional)
             </h3>
             <textarea
@@ -164,9 +162,14 @@ const AIResumeAnalyzer = () => {
               onChange={(e) => setJobDescription(e.target.value)}
               disabled={isAnalyzing}
               placeholder="Paste the job description here for a tailored JD Match score and keyword gap analysis..."
-              className="w-full bg-[#0f172a] border border-gray-600/60 rounded-xl p-4 text-sm text-gray-200 focus:outline-none focus:border-blue-500 h-32 resize-none transition-colors placeholder-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#0f172a] border border-gray-600/60 rounded-xl p-4 text-sm text-gray-200 focus:outline-none focus:border-blue-500 h-28 resize-none transition-colors placeholder-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
+
+          {/* Error Message */}
+          {errorMessage && (
+            <p className="mb-4 text-sm text-red-400">{errorMessage}</p>
+          )}
 
           {/* Section 3: Submit Action */}
           <div className="mt-auto">
