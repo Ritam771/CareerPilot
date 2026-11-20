@@ -1,89 +1,103 @@
-import React, { useState, useRef } from 'react';
-import { 
-  FiUploadCloud, FiFileText, FiCheckCircle, 
+import { useState, useRef } from 'react';
+import {
+  FiUploadCloud, FiFileText, FiCheckCircle,
   FiXCircle, FiMessageSquare, FiEdit3, FiInfo, FiTarget, FiBriefcase
 } from 'react-icons/fi';
 
 const AIResumeAnalyzer = () => {
   // --- STATE FOR BACKEND INTEGRATION ---
   const [resumeFile, setResumeFile] = useState(null);
+  const [targetRole, setTargetRole] = useState("Software Engineer");
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [analysisResults, setAnalysisResults] = useState(null);
-  
-  const fileInputRef = useRef(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // --- MOCK DATA (To be replaced by Backend API) ---
-  const mockBackendResponse = {
-    candidateName: "John Doe",
-    detectedSkills: "React, Node.js, Python, AWS",
-    status: "Parsed Successfully",
-    targetedRole: "Software Engineer",
-    atsScore: 84,
-    scoreLabel: "Good Match",
-    strengths: [
-      "Strong technical keyword presence",
-      "Clear experience hierarchy",
-      "Excellent formatting for ATS parsers"
-    ],
-    improvements: [
-      "Quantitative impact missing in bullet points",
-      "Include more system design terminology"
-    ],
-    jdMatch: {
-      matchedKeywords: ["React", "Node.js", "Python", "AWS", "REST APIs", "Git"],
-      missingKeywords: ["GraphQL", "Docker", "CI/CD", "Agile", "TypeScript"]
-    },
-    skillMatches: [
-      { label: "Overall JD Match", percent: 78, color: "bg-indigo-500" },
-      { label: "Technical Requirements", percent: 85, color: "bg-teal-400" },
-      { label: "Soft Skills & Leadership", percent: 60, color: "bg-blue-500" }
-    ]
-  };
+  const fileInputRef = useRef(null);
 
   // --- HANDLERS ---
   const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       setResumeFile(file);
       setAnalysisResults(null);
+      setErrorMessage("");
       setScanProgress(0);
     }
   };
 
-  const handleStartAnalysis = () => {
-    if (!resumeFile) return;
-    setIsAnalyzing(true);
-    setScanProgress(0);
+  const handleStartAnalysis = async () => {
+    if (!resumeFile) {
+      setErrorMessage("Please upload a resume PDF first.");
+      return;
+    }
+    if (!jobDescription.trim()) {
+      setErrorMessage("Please paste a job description before running analysis.");
+      return;
+    }
 
-    // TODO (Backend): Form Data Payload for API
-    // const formData = new FormData();
-    // formData.append('resume', resumeFile);
-    // formData.append('jobDescription', jobDescription);
-    // await axios.post('/api/analyze-resume', formData);
-    
-    // Simulate backend processing
-    const interval = setInterval(() => {
-      setScanProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsAnalyzing(false);
-          setAnalysisResults(mockBackendResponse);
-          return 100;
-        }
-        return prev + 5;
+    setIsAnalyzing(true);
+    setErrorMessage("");
+    setScanProgress(10);
+
+    const progressTimer = setInterval(() => {
+      setScanProgress((prev) => (prev < 90 ? prev + 5 : prev));
+    }, 300);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", resumeFile);
+
+      const jdPayload = {
+        role: targetRole.trim() || "Software Engineer",
+        description: jobDescription.trim(),
+      };
+
+      const jdBlob = new Blob([JSON.stringify(jdPayload)], {
+        type: "application/json",
       });
-    }, 150);
+      formData.append("jd", jdBlob);
+
+      const response = await fetch("http://localhost:8080/api/resume/ats", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(errorBody || `Server error (${response.status})`);
+      }
+
+      const data = await response.json();
+      clearInterval(progressTimer);
+      setScanProgress(100);
+      setAnalysisResults(data);
+    } catch (err) {
+      clearInterval(progressTimer);
+      setScanProgress(0);
+      setErrorMessage(
+        err.message || "Could not connect to backend on http://localhost:8080."
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const resetAnalyzer = () => {
     setResumeFile(null);
+    setTargetRole("Software Engineer");
     setJobDescription("");
     setAnalysisResults(null);
+    setErrorMessage("");
     setScanProgress(0);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
-
+  {errorMessage && (
+  <p className="mt-2 text-sm text-red-500">{errorMessage}</p>
+)}
   return (
     <div className="flex h-screen bg-[#0f172a] text-white p-6 gap-6 font-sans w-full overflow-hidden">
       
