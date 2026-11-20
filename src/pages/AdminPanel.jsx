@@ -6,12 +6,17 @@ const AdminPanel = () => {
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form States
+  // Form State with updated default company
   const [questionForm, setQuestionForm] = useState({
     category: "TECHNICAL",
     difficulty: "MEDIUM",
+    company: "TCS",
     questionText: "",
-    correctAnswer: ""
+    optionA: "",
+    optionB: "",
+    optionC: "",
+    optionD: "",
+    correctOption: "NONE" // "A", "B", "C", "D", or "NONE"
   });
 
   const [companyForm, setCompanyForm] = useState({
@@ -24,7 +29,24 @@ const AdminPanel = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setStatusMessage("");
-    
+
+    // Converts dropdown selection into true/false flags
+    const formattedOptions = [
+      { label: "A", text: questionForm.optionA, isCorrect: questionForm.correctOption === "A" },
+      { label: "B", text: questionForm.optionB, isCorrect: questionForm.correctOption === "B" },
+      { label: "C", text: questionForm.optionC, isCorrect: questionForm.correctOption === "C" },
+      { label: "D", text: questionForm.optionD, isCorrect: questionForm.correctOption === "D" },
+    ];
+
+    const payload = {
+      category: questionForm.category,
+      difficulty: questionForm.difficulty,
+      company: questionForm.company,
+      questionText: questionForm.questionText,
+      options: formattedOptions,
+      correctOption: questionForm.correctOption
+    };
+
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await fetch("http://localhost:8080/api/admin/questions", {
@@ -33,13 +55,21 @@ const AdminPanel = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(questionForm)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) throw new Error("Failed to add question to the database.");
       
       setStatusMessage("✅ Question added successfully!");
-      setQuestionForm({ ...questionForm, questionText: "", correctAnswer: "" }); // Clear text fields
+      setQuestionForm({
+        ...questionForm,
+        questionText: "",
+        optionA: "",
+        optionB: "",
+        optionC: "",
+        optionD: "",
+        correctOption: "NONE"
+      });
     } catch (error) {
       setStatusMessage(`❌ Error: ${error.message}`);
     } finally {
@@ -66,7 +96,7 @@ const AdminPanel = () => {
       if (!response.ok) throw new Error("Failed to add company to the database.");
       
       setStatusMessage("✅ Company added successfully!");
-      setCompanyForm({ name: "", logoUrl: "" }); // Reset form
+      setCompanyForm({ name: "", logoUrl: "" });
     } catch (error) {
       setStatusMessage(`❌ Error: ${error.message}`);
     } finally {
@@ -144,7 +174,7 @@ const AdminPanel = () => {
               <h1 className="text-3xl font-bold mb-8">Add New Question</h1>
               <form onSubmit={handleAddQuestion} className="bg-[#1e293b] p-8 rounded-xl border border-gray-800 shadow-sm space-y-6">
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">Category</label>
                     <select 
@@ -169,6 +199,21 @@ const AdminPanel = () => {
                       <option value="HARD">Hard</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Company</label>
+                    <select 
+                      value={questionForm.company}
+                      onChange={(e) => setQuestionForm({...questionForm, company: e.target.value})}
+                      className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                    >
+                      <option value="TCS">TCS</option>
+                      <option value="WIPRO">Wipro</option>
+                      <option value="CAPGEMINI">Capgemini</option>
+                      <option value="COGNIZANT">Cognizant</option>
+                      <option value="ACCENTURE">Accenture</option>
+                      <option value="DELOITTE">Deloitte</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -182,16 +227,37 @@ const AdminPanel = () => {
                   />
                 </div>
 
+                {/* Option Text Inputs (A, B, C, D) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {["A", "B", "C", "D"].map((opt) => (
+                    <div key={opt}>
+                      <label className="block text-sm font-medium text-gray-400 mb-2">Option {opt}</label>
+                      <input 
+                        type="text"
+                        required
+                        value={questionForm[`option${opt}`]}
+                        onChange={(e) => setQuestionForm({...questionForm, [`option${opt}`]: e.target.value})}
+                        className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                        placeholder={`Enter Option ${opt}...`}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Correct Option Dropdown (A, B, C, D, None) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Correct Answer / Solution</label>
-                  <input 
-                    type="text"
-                    required
-                    value={questionForm.correctAnswer}
-                    onChange={(e) => setQuestionForm({...questionForm, correctAnswer: e.target.value})}
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Correct Answer Option</label>
+                  <select 
+                    value={questionForm.correctOption}
+                    onChange={(e) => setQuestionForm({...questionForm, correctOption: e.target.value})}
                     className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
-                    placeholder="Provide the exact correct answer..."
-                  />
+                  >
+                    <option value="NONE">None</option>
+                    <option value="A">Option A</option>
+                    <option value="B">Option B</option>
+                    <option value="C">Option C</option>
+                    <option value="D">Option D</option>
+                  </select>
                 </div>
 
                 <div className="pt-4 border-t border-gray-800">
@@ -221,7 +287,7 @@ const AdminPanel = () => {
                     value={companyForm.name}
                     onChange={(e) => setCompanyForm({...companyForm, name: e.target.value})}
                     className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                    placeholder="e.g., Google, Microsoft, TCS"
+                    placeholder="e.g., TCS, Wipro, Capgemini, Deloitte"
                   />
                 </div>
 

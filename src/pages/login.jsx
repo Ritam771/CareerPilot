@@ -15,9 +15,9 @@ import {
 } from "react-icons/fi";
 
 const highlights = [
-  { icon: FiTarget, title: "Company-specific prep", text: "Practice the questions each recruiter actually asks." },
-  { icon: FiBarChart2, title: "Mock tests with analysis", text: "See exactly which topics cost you marks." },
-  { icon: FiCompass, title: "A plan that adapts", text: "Recommendations change as your scores improve." },
+  { icon: FiTarget, title: "Company Specific Preparation" },
+  { icon: FiBarChart2, title: "Mock Tests & Performance Analysis" },
+  { icon: FiCompass, title: "Personalized Learning Recommendations" },
 ];
 
 function Login() {
@@ -46,18 +46,14 @@ function Login() {
 
     setIsLoading(true);
     try {
-      // 1. Capture the response data from your auth service
       const data = await loginUser(identifier, password);
       
-      // 2. Save the role dynamically for the Admin Panel routing
-      // If the backend doesn't return a role yet, default to "USER"
       if (data && data.role) {
         localStorage.setItem("userRole", data.role.toUpperCase());
       } else {
         localStorage.setItem("userRole", "ADMIN");
       }
 
-      // 3. Redirect to dashboard on success
       navigate("/dashboard", { replace: true });
     } catch (error) {
       setNotice(error.message || "Login failed. Check your details and try again.");
@@ -81,42 +77,47 @@ function Login() {
   return (
     <div className="flex min-h-screen bg-white">
       {/* Left: brand panel */}
-      <section className="relative hidden w-[52%] overflow-hidden bg-[#0A1B2E] lg:flex">
+      <section className="relative hidden w-[52%] overflow-hidden bg-[#0A1B2E] lg:flex flex-col">
+        {/* CORRECTED: Background Image is now Mountain.png */}
         <img
-          src="/Mountain.png"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-50"
+          src="/Mountain.png" 
+          alt="Mountain Sunrise"
+          className="absolute inset-0 h-full w-full object-cover"
           onError={(e) => (e.currentTarget.style.display = "none")}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1B2E] via-[#0A1B2E]/70 to-[#0A1B2E]/30" />
+        {/* Soft gradient to make bottom text readable while keeping the sunrise bright */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        <div className="relative z-10 flex w-full flex-col justify-between p-12 xl:p-16">
-          <img
-            src="/logo.png"
-            alt="CareerPilot"
-            className="h-10 w-auto self-start"
-            onError={(e) => (e.currentTarget.style.display = "none")}
-          />
+        <div className="relative z-10 flex h-full w-full flex-col justify-between p-12 xl:p-16">
+          
+          {/* Logo: Moved to Top Center. CORRECTED: src is now /logo.png */}
+          <div className="flex w-full justify-center pt-8">
+            <img
+              src="/logo.png"
+              alt="CareerPilot"
+              className="h-16 w-auto drop-shadow-xl"
+              onError={(e) => (e.currentTarget.style.display = "none")}
+            />
+          </div>
 
-          <div>
-            <h2 className="max-w-md text-4xl font-semibold leading-tight tracking-tight text-white xl:text-5xl">
-              Your next offer starts with today’s practice.
-            </h2>
-
-            <ul className="mt-10 max-w-md space-y-5">
-              {highlights.map(({ icon: Icon, title, text }) => (
-                <li key={title} className="flex gap-4">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-amber-300 ring-1 ring-white/15 backdrop-blur">
-                    <Icon size={19} />
+          {/* Highlights: Moved to Bottom Left */}
+          <div className="pb-8">
+            <ul className="max-w-md space-y-4">
+              {highlights.map(({ icon: Icon, title }) => (
+                <li key={title} className="flex items-center gap-4">
+                  {/* Circular blurred icon container */}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md shadow-lg">
+                    <Icon size={18} />
                   </span>
-                  <div>
-                    <p className="font-medium text-white">{title}</p>
-                    <p className="mt-0.5 text-sm leading-relaxed text-slate-300">{text}</p>
-                  </div>
+                  {/* Single line clean text with drop shadow */}
+                  <p className="font-semibold text-white drop-shadow-md tracking-wide">
+                    {title}
+                  </p>
                 </li>
               ))}
             </ul>
           </div>
+
         </div>
       </section>
 
@@ -212,7 +213,7 @@ function Login() {
 
           <p className="mt-8 text-center text-sm text-slate-500">
             New to CareerPilot?
-            <Link to="/signin" className="ml-1 font-semibold text-teal-700 hover:underline">
+            <Link to="/signup" className="ml-1 font-semibold text-teal-700 hover:underline">
               Create an account
             </Link>
           </p>
