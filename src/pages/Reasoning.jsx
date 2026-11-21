@@ -103,7 +103,7 @@ const Reasoning = () => {
   );
 
   const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) return;
+    if (page < 1 || page > Math.max(1, totalPages)) return;
     setCurrentPage(page);
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -199,125 +199,121 @@ const Reasoning = () => {
             No reasoning topics found for the selected filter.
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 pb-8">
-              {paginatedTopics.map((topic) => {
-                const completed = topic.completed ?? 0;
-                const total = topic.totalQuestions ?? 0;
-                const progressPercent = total > 0 ? (completed / total) * 100 : 0;
-                const askedIn = Array.isArray(topic.companies)
-                  ? topic.companies
-                  : topic.company
-                  ? [topic.company]
-                  : [];
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 pb-8">
+            {paginatedTopics.map((topic) => {
+              const completed = topic.completed ?? 0;
+              const total = topic.totalQuestions ?? 0;
+              const progressPercent = total > 0 ? (completed / total) * 100 : 0;
+              const askedIn = Array.isArray(topic.companies)
+                ? topic.companies
+                : topic.company
+                ? [topic.company]
+                : [];
 
-                return (
-                  <div
-                    key={topic.id}
-                    onClick={() => handleCardClick(topic)}
-                    className="cursor-pointer bg-[#1e293b] rounded-xl p-6 border border-gray-700 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 transition-all flex flex-col shadow-sm"
-                  >
-                    {/* Card Header (Type & Difficulty) */}
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <span className="text-xs font-semibold text-indigo-400 mb-1 block uppercase tracking-wider">
-                          {topic.type || topic.section || "Reasoning"}
+              return (
+                <div
+                  key={topic.id}
+                  onClick={() => handleCardClick(topic)}
+                  className="cursor-pointer bg-[#1e293b] rounded-xl p-6 border border-gray-700 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/10 transition-all flex flex-col shadow-sm"
+                >
+                  {/* Card Header (Type & Difficulty) */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <span className="text-xs font-semibold text-indigo-400 mb-1 block uppercase tracking-wider">
+                        {topic.type || topic.section || "Reasoning"}
+                      </span>
+                      <h3 className="text-lg font-bold text-white">
+                        {topic.title || topic.name}
+                      </h3>
+                    </div>
+                    <span
+                      className={`text-xs px-2.5 py-1 rounded-md border ${getDifficultyColor(
+                        topic.difficulty
+                      )} font-medium`}
+                    >
+                      {topic.difficulty || "Medium"}
+                    </span>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-400 text-sm mb-5 flex-1">
+                    {topic.description}
+                  </p>
+
+                  {/* Companies where these questions were asked */}
+                  {askedIn.length > 0 && (
+                    <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-gray-800 pt-3">
+                      <span className="text-xs text-gray-400">Asked in:</span>
+                      {askedIn.map((comp) => (
+                        <span
+                          key={comp}
+                          className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-300"
+                        >
+                          {comp}
                         </span>
-                        <h3 className="text-lg font-bold text-white">
-                          {topic.title || topic.name}
-                        </h3>
-                      </div>
-                      <span
-                        className={`text-xs px-2.5 py-1 rounded-md border ${getDifficultyColor(
-                          topic.difficulty
-                        )} font-medium`}
-                      >
-                        {topic.difficulty || "Medium"}
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Progress Bar */}
+                  <div className="mt-auto">
+                    <div className="flex justify-between text-xs text-gray-400 mb-2 font-medium">
+                      <span>Progress</span>
+                      <span>
+                        {completed} / {total} Solved
                       </span>
                     </div>
-
-                    {/* Description */}
-                    <p className="text-gray-400 text-sm mb-5 flex-1">
-                      {topic.description}
-                    </p>
-
-                    {/* Companies where these questions were asked */}
-                    {askedIn.length > 0 && (
-                      <div className="mb-4 flex flex-wrap items-center gap-2 border-t border-gray-800 pt-3">
-                        <span className="text-xs text-gray-400">Asked in:</span>
-                        {askedIn.map((comp) => (
-                          <span
-                            key={comp}
-                            className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-300"
-                          >
-                            {comp}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Progress Bar */}
-                    <div className="mt-auto">
-                      <div className="flex justify-between text-xs text-gray-400 mb-2 font-medium">
-                        <span>Progress</span>
-                        <span>
-                          {completed} / {total} Solved
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-800 rounded-full h-1.5">
-                        <div
-                          className="bg-indigo-500 h-1.5 rounded-full"
-                          style={{ width: `${progressPercent}%` }}
-                        ></div>
-                      </div>
+                    <div className="w-full bg-gray-800 rounded-full h-1.5">
+                      <div
+                        className="bg-indigo-500 h-1.5 rounded-full"
+                        style={{ width: `${progressPercent}%` }}
+                      ></div>
                     </div>
-
-                    <p className="mt-4 text-xs font-medium text-indigo-400">
-                      Click to start practice →
-                    </p>
                   </div>
-                );
-              })}
-            </div>
 
-            {/* FOOTER PAGINATION */}
-            {totalPages > 1 && (
-              <footer className="mt-auto mb-6 flex items-center justify-center gap-2 border-t border-gray-800 pt-6">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="rounded-lg border border-gray-700 bg-[#1e293b] px-3.5 py-2 text-sm text-gray-300 transition hover:border-indigo-500 hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Previous
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`h-9 w-9 rounded-lg border text-sm font-semibold transition ${
-                        currentPage === page
-                          ? "border-indigo-500 bg-indigo-600/25 text-indigo-300"
-                          : "border-gray-700 bg-[#1e293b] text-gray-300 hover:border-indigo-500 hover:text-indigo-300"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="rounded-lg border border-gray-700 bg-[#1e293b] px-3.5 py-2 text-sm text-gray-300 transition hover:border-indigo-500 hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Next
-                </button>
-              </footer>
-            )}
-          </>
+                  <p className="mt-4 text-xs font-medium text-indigo-400">
+                    Click to start practice →
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         )}
+
+        {/* FOOTER PAGINATION (Always visible) */}
+        <footer className="mt-auto mb-6 flex items-center justify-center gap-2 border-t border-gray-800 pt-6">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="rounded-lg border border-gray-700 bg-[#1e293b] px-3.5 py-2 text-sm text-gray-300 transition hover:border-indigo-500 hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Previous
+          </button>
+
+          {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map(
+            (page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`h-9 w-9 rounded-lg border text-sm font-semibold transition ${
+                  currentPage === page
+                    ? "border-indigo-500 bg-indigo-600/25 text-indigo-300"
+                    : "border-gray-700 bg-[#1e293b] text-gray-300 hover:border-indigo-500 hover:text-indigo-300"
+                }`}
+              >
+                {page}
+              </button>
+            )
+          )}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage >= Math.max(1, totalPages)}
+            className="rounded-lg border border-gray-700 bg-[#1e293b] px-3.5 py-2 text-sm text-gray-300 transition hover:border-indigo-500 hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Next
+          </button>
+        </footer>
       </div>
 
       {/* Basic Scrollbar Styling */}
