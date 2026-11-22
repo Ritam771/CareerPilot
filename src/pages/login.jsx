@@ -78,39 +78,38 @@ function Login() {
     <div className="flex min-h-screen bg-white">
       {/* Left: brand panel */}
       <section className="relative hidden w-[52%] overflow-hidden bg-[#0A1B2E] lg:flex flex-col">
-        {/* CORRECTED: Background Image is now Mountain.png */}
+        {/* Background Image: object-top keeps the upper sky visible and pushes the peak lower */}
         <img
           src="/Mountain.png" 
           alt="Mountain Sunrise"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover object-top"
           onError={(e) => (e.currentTarget.style.display = "none")}
         />
-        {/* Soft gradient to make bottom text readable while keeping the sunrise bright */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        {/* Soft gradient to keep the bottom-left text crisp while preserving the sunrise */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/10" />
 
-        <div className="relative z-10 flex h-full w-full flex-col justify-between p-12 xl:p-16">
+        <div className="relative z-10 flex h-full w-full flex-col justify-between px-10 pb-10 pt-2 xl:px-14 xl:pb-14 xl:pt-3">
           
-          {/* Logo: Moved to Top Center. CORRECTED: src is now /logo.png */}
-          <div className="flex w-full justify-center pt-8">
+          {/* Logo: High up at the top of the sky above the mountain peak */}
+          <div className="flex w-full justify-center">
             <img
               src="/logo.png"
               alt="CareerPilot"
-              className="h-16 w-auto drop-shadow-xl"
+              className="h-24 xl:h-28 w-auto object-contain drop-shadow-2xl"
               onError={(e) => (e.currentTarget.style.display = "none")}
             />
           </div>
 
-          {/* Highlights: Moved to Bottom Left */}
-          <div className="pb-8">
-            <ul className="max-w-md space-y-4">
+          {/* Highlights: Top 3 features tucked cleanly in Bottom Left */}
+          <div className="pb-4">
+            <ul className="max-w-md space-y-3.5">
               {highlights.map(({ icon: Icon, title }) => (
-                <li key={title} className="flex items-center gap-4">
-                  {/* Circular blurred icon container */}
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md shadow-lg">
+                <li key={title} className="flex items-center gap-3.5">
+                  {/* Hazy frosted teal circle */}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-teal-300/25 bg-teal-900/50 text-teal-100 backdrop-blur-md shadow-lg">
                     <Icon size={18} />
                   </span>
-                  {/* Single line clean text with drop shadow */}
-                  <p className="font-semibold text-white drop-shadow-md tracking-wide">
+                  <p className="text-sm xl:text-base font-medium text-white/95 drop-shadow-md tracking-wide">
                     {title}
                   </p>
                 </li>

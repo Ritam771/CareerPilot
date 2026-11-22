@@ -12,7 +12,8 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import MockTests from "./pages/MockTests";
 import AIResumeAnalyzer from "./pages/AIResumeAnalyzer";
-import AdminPanel from "./pages/AdminPanel"; // Import the AdminPanel component
+import AdminPanel from "./pages/AdminPanel"; 
+import Signin from "./pages/Signin"; 
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/mock-tests" element={<MockTests />} />
           <Route path="/ai-resume-analyzer" element={<AIResumeAnalyzer />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/signup" element={<Signin />} />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
