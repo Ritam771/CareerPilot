@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext"; // verify exact folder & export style
-
+import Signin from "./pages/Signin"
 import Login from "./pages/login";
 import Dashboard from "./pages/Dashboard";
 import Aptitude from "./pages/Aptitude";
@@ -20,6 +20,7 @@ function App() {
       <ThemeProvider>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/aptitude" element={<Aptitude />} />
           <Route path="/reasoning" element={<Reasoning />} />

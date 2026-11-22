@@ -94,6 +94,13 @@ const Sidebar = () => {
             <span>Profile</span>
           </NavLink>
         </li>
+        {/* Mock Tests */}
+        <li>
+          <NavLink to="/mock-tests" className={navLinkStyles}>
+            <FiClipboard />
+            <span>Mock Tests</span>
+          </NavLink>
+        </li>
 
         {/* Aptitude */}
         <li>
@@ -147,13 +154,7 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Mock Tests */}
-        <li>
-          <NavLink to="/mock-tests" className={navLinkStyles}>
-            <FiClipboard />
-            <span>Mock Tests</span>
-          </NavLink>
-        </li>
+
 
         {/* Progress */}
         <li>
