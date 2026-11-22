@@ -1,15 +1,13 @@
 import { useState } from 'react';
-import { FiGrid, FiFileText, FiBriefcase, FiPlus } from "react-icons/fi";
+import { FiGrid, FiFileText, FiBriefcase, FiPlus, FiCode } from "react-icons/fi";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // State for companies fetched from the backend
   const [companies, setCompanies] = useState([]);
 
-  // Form State with updated default company
   const [questionForm, setQuestionForm] = useState({
     category: "TECHNICAL",
     difficulty: "MEDIUM",
@@ -19,7 +17,7 @@ const AdminPanel = () => {
     optionB: "",
     optionC: "",
     optionD: "",
-    correctOption: "NONE" // "A", "B", "C", "D", or "NONE"
+    correctOption: "NONE"
   });
 
   const [companyForm, setCompanyForm] = useState({
@@ -27,7 +25,14 @@ const AdminPanel = () => {
     logoUrl: ""
   });
 
-  // --- Fetch Companies from Backend ---
+  const [codingForm, setCodingForm] = useState({
+    number: "",
+    title: "",
+    difficulty: "Easy",
+    leetcodeUrl: "",
+    description: ""
+  });
+
   const fetchCompanies = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -46,17 +51,12 @@ const AdminPanel = () => {
       console.error("Error fetching companies:", error.message);
     }
   };
-{/*
-  useEffect(() => {
-    fetchCompanies();
-  }, []);*/}
-  // --- API Handlers ---
+
   const handleAddQuestion = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setStatusMessage("");
 
-    // Converts dropdown selection into true/false flags
     const formattedOptions = [
       { label: "A", text: questionForm.optionA, isCorrect: questionForm.correctOption === "A" },
       { label: "B", text: questionForm.optionB, isCorrect: questionForm.correctOption === "B" },
@@ -85,7 +85,7 @@ const AdminPanel = () => {
       });
 
       if (!response.ok) throw new Error("Failed to add question to the database.");
-      
+
       setStatusMessage("✅ Question added successfully!");
       setQuestionForm({
         ...questionForm,
@@ -95,6 +95,47 @@ const AdminPanel = () => {
         optionC: "",
         optionD: "",
         correctOption: "NONE"
+      });
+    } catch (error) {
+      setStatusMessage(`❌ Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAddCodingQuestion = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatusMessage("");
+
+    const payload = {
+      number: Number(codingForm.number),
+      title: codingForm.title.trim(),
+      difficulty: codingForm.difficulty,
+      leetcodeUrl: codingForm.leetcodeUrl.trim(),
+      description: codingForm.description.trim()
+    };
+
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const response = await fetch("http://localhost:8080/api/coding/problems", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error("Failed to add coding question to the database.");
+
+      setStatusMessage("✅ Coding question added successfully!");
+      setCodingForm({
+        number: "",
+        title: "",
+        difficulty: "Easy",
+        leetcodeUrl: "",
+        description: ""
       });
     } catch (error) {
       setStatusMessage(`❌ Error: ${error.message}`);
@@ -120,10 +161,10 @@ const AdminPanel = () => {
       });
 
       if (!response.ok) throw new Error("Failed to add company to the database.");
-      
+
       setStatusMessage("✅ Company added successfully!");
       setCompanyForm({ name: "", logoUrl: "" });
-      fetchCompanies(); // Refresh dropdown list immediately
+      fetchCompanies();
     } catch (error) {
       setStatusMessage(`❌ Error: ${error.message}`);
     } finally {
@@ -133,25 +174,29 @@ const AdminPanel = () => {
 
   return (
     <div className="flex h-screen bg-[#0f172a] text-white font-sans w-full">
-      
-      {/* Sidebar Navigation */}
       <div className="w-64 bg-[#1e293b] border-r border-gray-800 flex flex-col p-6 shrink-0">
         <h2 className="text-xl font-bold mb-8 text-teal-400 tracking-wide">Admin Portal</h2>
-        
+
         <nav className="flex flex-col gap-2">
-          <button 
+          <button
             onClick={() => setActiveTab("dashboard")}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition font-medium ${activeTab === "dashboard" ? "bg-teal-500/20 text-teal-400 border border-teal-500/30" : "text-gray-400 hover:bg-gray-800 hover:text-gray-200"}`}
           >
             <FiGrid size={18} /> Overview
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab("questions")}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition font-medium ${activeTab === "questions" ? "bg-teal-500/20 text-teal-400 border border-teal-500/30" : "text-gray-400 hover:bg-gray-800 hover:text-gray-200"}`}
           >
             <FiFileText size={18} /> Add Questions
           </button>
-          <button 
+          <button
+            onClick={() => setActiveTab("coding")}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition font-medium ${activeTab === "coding" ? "bg-teal-500/20 text-teal-400 border border-teal-500/30" : "text-gray-400 hover:bg-gray-800 hover:text-gray-200"}`}
+          >
+            <FiCode size={18} /> Add Coding
+          </button>
+          <button
             onClick={() => setActiveTab("companies")}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition font-medium ${activeTab === "companies" ? "bg-teal-500/20 text-teal-400 border border-teal-500/30" : "text-gray-400 hover:bg-gray-800 hover:text-gray-200"}`}
           >
@@ -160,11 +205,8 @@ const AdminPanel = () => {
         </nav>
       </div>
 
-      {/* Main Content Area */}
       <div className="flex-1 p-8 lg:p-10 overflow-y-auto">
-        
         <div className="max-w-4xl mx-auto">
-          {/* Status Message Alert */}
           {statusMessage && (
             <div className={`mb-6 p-4 rounded-lg border flex justify-between items-center animate-fade-in ${statusMessage.includes("❌") ? "bg-red-900/20 border-red-500/50 text-red-400" : "bg-teal-900/20 border-teal-500/50 text-teal-400"}`}>
               <span className="font-medium">{statusMessage}</span>
@@ -172,7 +214,6 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {/* TAB 1: Dashboard Overview */}
           {activeTab === "dashboard" && (
             <div className="animate-fade-in">
               <h1 className="text-3xl font-bold mb-8">Platform Overview</h1>
@@ -195,18 +236,16 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {/* TAB 2: Add Questions */}
           {activeTab === "questions" && (
             <div className="animate-fade-in">
               <h1 className="text-3xl font-bold mb-8">Add New Question</h1>
               <form onSubmit={handleAddQuestion} className="bg-[#1e293b] p-8 rounded-xl border border-gray-800 shadow-sm space-y-6">
-                
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">Category</label>
-                    <select 
+                    <select
                       value={questionForm.category}
-                      onChange={(e) => setQuestionForm({...questionForm, category: e.target.value})}
+                      onChange={(e) => setQuestionForm({ ...questionForm, category: e.target.value })}
                       className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
                     >
                       <option value="TECHNICAL">Technical</option>
@@ -216,9 +255,9 @@ const AdminPanel = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">Difficulty</label>
-                    <select 
+                    <select
                       value={questionForm.difficulty}
-                      onChange={(e) => setQuestionForm({...questionForm, difficulty: e.target.value})}
+                      onChange={(e) => setQuestionForm({ ...questionForm, difficulty: e.target.value })}
                       className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
                     >
                       <option value="EASY">Easy</option>
@@ -228,9 +267,9 @@ const AdminPanel = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">Company</label>
-                    <select 
+                    <select
                       value={questionForm.company}
-                      onChange={(e) => setQuestionForm({...questionForm, company: e.target.value})}
+                      onChange={(e) => setQuestionForm({ ...questionForm, company: e.target.value })}
                       className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
                     >
                       <option value="NONE">None</option>
@@ -245,25 +284,24 @@ const AdminPanel = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">Question Text</label>
-                  <textarea 
+                  <textarea
                     required
                     value={questionForm.questionText}
-                    onChange={(e) => setQuestionForm({...questionForm, questionText: e.target.value})}
+                    onChange={(e) => setQuestionForm({ ...questionForm, questionText: e.target.value })}
                     className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white min-h-[120px] focus:outline-none focus:border-teal-500 transition-colors"
                     placeholder="Type the question statement here..."
                   />
                 </div>
 
-                {/* Option Text Inputs (A, B, C, D) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {["A", "B", "C", "D"].map((opt) => (
                     <div key={opt}>
                       <label className="block text-sm font-medium text-gray-400 mb-2">Option {opt}</label>
-                      <input 
+                      <input
                         type="text"
                         required
                         value={questionForm[`option${opt}`]}
-                        onChange={(e) => setQuestionForm({...questionForm, [`option${opt}`]: e.target.value})}
+                        onChange={(e) => setQuestionForm({ ...questionForm, [`option${opt}`]: e.target.value })}
                         className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
                         placeholder={`Enter Option ${opt}...`}
                       />
@@ -271,12 +309,11 @@ const AdminPanel = () => {
                   ))}
                 </div>
 
-                {/* Correct Option Dropdown (A, B, C, D, None) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">Correct Answer Option</label>
-                  <select 
+                  <select
                     value={questionForm.correctOption}
-                    onChange={(e) => setQuestionForm({...questionForm, correctOption: e.target.value})}
+                    onChange={(e) => setQuestionForm({ ...questionForm, correctOption: e.target.value })}
                     className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
                   >
                     <option value="NONE">None</option>
@@ -288,8 +325,8 @@ const AdminPanel = () => {
                 </div>
 
                 <div className="pt-4 border-t border-gray-800">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={isSubmitting}
                     className="bg-teal-500 hover:bg-teal-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 transition-colors"
                   >
@@ -300,19 +337,95 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {/* TAB 3: Add Companies */}
+          {activeTab === "coding" && (
+            <div className="animate-fade-in">
+              <h1 className="text-3xl font-bold mb-8">Add Coding Question</h1>
+              <form onSubmit={handleAddCodingQuestion} className="bg-[#1e293b] p-8 rounded-xl border border-gray-800 shadow-sm space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">LeetCode Question Number</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={codingForm.number}
+                      onChange={(e) => setCodingForm({ ...codingForm, number: e.target.value })}
+                      className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                      placeholder="e.g., 1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Difficulty Level</label>
+                    <select
+                      value={codingForm.difficulty}
+                      onChange={(e) => setCodingForm({ ...codingForm, difficulty: e.target.value })}
+                      className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                    >
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Hard">Hard</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Question Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={codingForm.title}
+                    onChange={(e) => setCodingForm({ ...codingForm, title: e.target.value })}
+                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                    placeholder="e.g., Two Sum"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">LeetCode Link</label>
+                  <input
+                    type="url"
+                    required
+                    value={codingForm.leetcodeUrl}
+                    onChange={(e) => setCodingForm({ ...codingForm, leetcodeUrl: e.target.value })}
+                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                    placeholder="https://leetcode.com/problems/two-sum/"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Short Description (Optional)</label>
+                  <textarea
+                    value={codingForm.description}
+                    onChange={(e) => setCodingForm({ ...codingForm, description: e.target.value })}
+                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white min-h-[90px] focus:outline-none focus:border-teal-500 transition-colors"
+                    placeholder="Briefly describe the problem..."
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-gray-800">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-teal-500 hover:bg-teal-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 transition-colors"
+                  >
+                    <FiPlus /> {isSubmitting ? "Saving..." : "Save Coding Question"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
           {activeTab === "companies" && (
             <div className="animate-fade-in">
               <h1 className="text-3xl font-bold mb-8">Add New Company</h1>
               <form onSubmit={handleAddCompany} className="bg-[#1e293b] p-8 rounded-xl border border-gray-800 shadow-sm space-y-6">
-                
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">Company Name</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={companyForm.name}
-                    onChange={(e) => setCompanyForm({...companyForm, name: e.target.value})}
+                    onChange={(e) => setCompanyForm({ ...companyForm, name: e.target.value })}
                     className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="e.g., TCS, Wipro, Capgemini, Deloitte"
                   />
@@ -320,32 +433,31 @@ const AdminPanel = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">Logo Image URL</label>
-                  <input 
+                  <input
                     type="url"
                     required
                     value={companyForm.logoUrl}
-                    onChange={(e) => setCompanyForm({...companyForm, logoUrl: e.target.value})}
+                    onChange={(e) => setCompanyForm({ ...companyForm, logoUrl: e.target.value })}
                     className="w-full bg-[#0f172a] border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="https://example.com/company-logo.png"
                   />
                 </div>
 
-                {/* Logo Preview */}
                 {companyForm.logoUrl && (
                   <div className="p-4 border border-gray-700 rounded-lg bg-[#0f172a] inline-block">
                     <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">Logo Preview</p>
-                    <img 
-                      src={companyForm.logoUrl} 
-                      alt="Preview" 
-                      className="h-16 object-contain bg-white rounded p-1" 
-                      onError={(e) => e.target.style.display = 'none'} 
+                    <img
+                      src={companyForm.logoUrl}
+                      alt="Preview"
+                      className="h-16 object-contain bg-white rounded p-1"
+                      onError={(e) => e.target.style.display = 'none'}
                     />
                   </div>
                 )}
 
                 <div className="pt-4 border-t border-gray-800">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={isSubmitting}
                     className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 transition-colors"
                   >
@@ -356,10 +468,10 @@ const AdminPanel = () => {
             </div>
           )}
         </div>
-
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(5px); }
           to { opacity: 1; transform: translateY(0); }
