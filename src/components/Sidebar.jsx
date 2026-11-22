@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { logoutUser, getCurrentUser } from "../services/auth"; // Imported getCurrentUser
+import { logoutUser, getCurrentUser } from "../services/auth";
 import { useTheme } from "../context/ThemeContext";
-import Avatar from "./Avatar"; 
+import Avatar from "./Avatar";
 
 import {
   FiCompass,
@@ -16,32 +16,29 @@ import {
   FiBarChart2,
   FiBookmark,
   FiLogOut,
-  FiFileText, 
-  FiShield, 
+  FiFileText,
+  FiShield,
 } from "react-icons/fi";
+
+const SHOW_UPGRADE_FEATURES = false;
 
 const Sidebar = () => {
   const { darkMode } = useTheme();
   const navigate = useNavigate();
 
-  // State to hold the current user
   const [user, setUser] = useState(null);
 
-  // Fetch the current user when the sidebar loads
   useEffect(() => {
     setUser(getCurrentUser());
   }, []);
 
-  // Retrieve the role dynamically from local storage
   const userRole = localStorage.getItem("userRole") || "USER";
 
-  // Handle logout
   const handleLogout = () => {
     logoutUser();
     navigate("/", { replace: true });
   };
 
-  // Navigation styling
   const navLinkStyles = ({ isActive }) =>
     `flex items-center gap-3 px-3 py-2 rounded-md text-xs cursor-pointer transition ${
       isActive
@@ -59,7 +56,6 @@ const Sidebar = () => {
           : "bg-white border-gray-200"
       } border-r`}
     >
-      {/* Logo */}
       <div className="flex items-center gap-2 px-2 mb-6">
         <FiCompass
           className={`text-xl ${
@@ -76,10 +72,7 @@ const Sidebar = () => {
         </h1>
       </div>
 
-      {/* Navigation */}
       <ul className="space-y-1">
-
-        {/* Dashboard */}
         <li>
           <NavLink to="/dashboard" className={navLinkStyles}>
             <FiCompass />
@@ -87,7 +80,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Profile */}
         <li>
           <NavLink to="/profile" className={navLinkStyles}>
             <FiUser />
@@ -95,7 +87,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Aptitude */}
         <li>
           <NavLink to="/aptitude" className={navLinkStyles}>
             <FiBookOpen />
@@ -103,7 +94,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Reasoning */}
         <li>
           <NavLink to="/reasoning" className={navLinkStyles}>
             <FiHelpCircle />
@@ -111,7 +101,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Technical */}
         <li>
           <NavLink to="/technical" className={navLinkStyles}>
             <FiCode />
@@ -119,7 +108,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Coding */}
         <li>
           <NavLink to="/coding" className={navLinkStyles}>
             <FiCode />
@@ -127,7 +115,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Company Prep */}
         <li>
           <NavLink to="/company-prep" className={navLinkStyles}>
             <FiBriefcase />
@@ -135,7 +122,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* AI Resume Analyzer */}
         <li>
           <NavLink to="/ai-resume-analyzer" className={navLinkStyles}>
             <FiFileText
@@ -147,7 +133,6 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Mock Tests */}
         <li>
           <NavLink to="/mock-tests" className={navLinkStyles}>
             <FiClipboard />
@@ -155,43 +140,40 @@ const Sidebar = () => {
           </NavLink>
         </li>
 
-        {/* Progress */}
-        <li>
-          <NavLink to="/progress" className={navLinkStyles}>
-            <FiBarChart2 />
-            <span>Progress</span>
-          </NavLink>
-        </li>
+        {SHOW_UPGRADE_FEATURES && (
+          <>
+            <li>
+              <NavLink to="/progress" className={navLinkStyles}>
+                <FiBarChart2 />
+                <span>Progress</span>
+              </NavLink>
+            </li>
 
-        {/* Bookmarks */}
-        <li>
-          <NavLink to="/bookmarks" className={navLinkStyles}>
-            <FiBookmark />
-            <span>Bookmarks</span>
-          </NavLink>
-        </li>
+            <li>
+              <NavLink to="/bookmarks" className={navLinkStyles}>
+                <FiBookmark />
+                <span>Bookmarks</span>
+              </NavLink>
+            </li>
 
-        {/* Roadmap */}
-        <li>
-          <NavLink to="/roadmap" className={navLinkStyles}>
-            <FiMap />
-            <span>Roadmap</span>
-          </NavLink>
-        </li>
+            <li>
+              <NavLink to="/roadmap" className={navLinkStyles}>
+                <FiMap />
+                <span>Roadmap</span>
+              </NavLink>
+            </li>
+          </>
+        )}
       </ul>
 
-      {/* Bottom Navigation */}
       <div
         className={`border-t mt-5 pt-3 flex flex-col gap-2 ${
           darkMode ? "border-gray-700" : "border-gray-200"
         }`}
       >
-        {/* User Mini-Profile with Dynamic Adventurer Avatar */}
         <div className="flex items-center gap-3 px-3 mb-2 mt-2">
-          {/* Dynamically pass the user's name as the seed */}
           <Avatar seed={user?.name || "User"} size="w-9 h-9" />
           <div className="flex flex-col overflow-hidden">
-            {/* Dynamically display the user's name and truncate if it's too long */}
             <span className={`text-sm font-bold truncate ${darkMode ? "text-white" : "text-slate-800"}`}>
               {user?.name || "User"}
             </span>
@@ -201,7 +183,6 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* DYNAMIC ADMIN LINK: Only renders if userRole is "ADMIN" */}
         {userRole === "ADMIN" && (
           <div>
             <NavLink to="/admin" className={navLinkStyles}>
@@ -211,7 +192,6 @@ const Sidebar = () => {
           </div>
         )}
 
-        {/* Logout */}
         <button
           type="button"
           onClick={handleLogout}
