@@ -1,126 +1,205 @@
-const API_BASE_URL = "http://localhost:8080/api/auth";
+
+const USERS_KEY = "careerPilotUsers";
 const SESSION_KEY = "careerPilotSession";
 
+// ==========================================
+// 1. Read Registered Users
+// ==========================================
+function readUsers() {
+  try {
+    const users = JSON.parse(
+      localStorage.getItem(USERS_KEY) || "[]"
+    );
+
+    return Array.isArray(users) ? users : [];
+  } catch (error) {
+    console.error("Error reading users:", error);
+    return [];
+  }
+}
+
+// ==========================================
+// 2. Save Registered Users
+// ==========================================
+function saveUsers(users) {
+  localStorage.setItem(
+    USERS_KEY,
+    JSON.stringify(users)
+  );
+}
+
+// ==========================================
+// 3. Create User Session
+// ==========================================
 function createSession(user) {
   const session = {
     id: user.id,
     name: user.name,
+    // Older accounts stored the email/phone in "identifier"
     email: user.email || user.identifier || "",
     phone: user.phone || "",
   };
 
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify(session)
+  );
+
   return session;
 }
 
+// ==========================================
+// 4. Register New User
+// ==========================================
 export async function registerUser(form) {
+  const users = readUsers();
+
   const name = form.name?.trim();
   const email = form.email?.trim().toLowerCase();
   const phone = form.phone?.trim() || "";
   const password = form.password;
 
+  // Validate required fields
   if (!name || !email || !password) {
     throw new Error("Please fill in all required fields.");
   }
 
-  const response = await fetch(`${API_BASE_URL}/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      phone,
-      password,
-    }),
-  });
+  // Check duplicate email
+  const existingUser = users.find(
+    (user) => user.email?.toLowerCase() === email
+  );
 
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.message || "Unable to create account.");
+  if (existingUser) {
+    throw new Error(
+      "This email is already registered. Please login."
+    );
   }
 
-  if (data.token) {
-    localStorage.setItem("jwtToken", data.token);
-  }
-  if (data.role) {
-    localStorage.setItem("userRole", data.role);
+  // Check duplicate phone
+  if (phone) {
+    const existingPhone = users.find(
+      (user) => user.phone === phone
+    );
+
+    if (existingPhone) {
+      throw new Error(
+        "This phone number is already registered."
+      );
+    }
   }
 
-  const user = data.user || {
-    id: data.id || `user-${Date.now()}`,
-    name: data.name || name,
-    email: data.email || email,
-    phone: data.phone || phone,
+  // Create new user
+  const newUser = {
+    id:
+      globalThis.crypto?.randomUUID?.() ||
+      `user-${Date.now()}`,
+
+    name,
+    email,
+    phone,
+    password,
+
+    createdAt: new Date().toISOString(),
   };
 
-  return createSession(user);
+  try {
+    // Save registered user
+    saveUsers([...users, newUser]);
+
+    // Automatically create session after registration
+    const session = createSession(newUser);
+
+    return session;
+
+  } catch (error) {
+    console.error("Registration error:", error);
+
+    throw new Error(
+      "Unable to create account. Check browser storage."
+    );
+  }
 }
 
+// ==========================================
+// 5. Login User Using Email or Phone
+// ==========================================
 export async function loginUser(identifier, password) {
+  const users = readUsers();
+
   const cleanIdentifier = identifier?.trim().toLowerCase();
 
   if (!cleanIdentifier || !password) {
-    throw new Error("Please enter your email/phone and password.");
+    throw new Error(
+      "Please enter your email/phone and password."
+    );
   }
 
-  const response = await fetch(`${API_BASE_URL}/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: cleanIdentifier,
-      password,
-    }),
+  // Find registered user
+  const user = users.find((item) => {
+    const emailMatch =
+      item.email?.toLowerCase() === cleanIdentifier ||
+      item.identifier?.toLowerCase() === cleanIdentifier;
+
+    const phoneMatch =
+      !!item.phone && item.phone === identifier.trim();
+
+    return (
+      (emailMatch || phoneMatch) &&
+      item.password === password
+    );
   });
 
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.message || "Invalid email/phone or password.");
+  if (!user) {
+    throw new Error(
+      "Invalid email/phone or password."
+    );
   }
 
-  if (data.token) {
-    localStorage.setItem("jwtToken", data.token);
-  }
-  if (data.role) {
-    localStorage.setItem("userRole", data.role);
-  }
+  try {
+    // Create session for the logged-in user
+    return createSession(user);
 
-  const user = data.user || {
-    id: data.id || `user-${Date.now()}`,
-    name: data.name || "User",
-    email: data.email || cleanIdentifier,
-    phone: data.phone || "",
-  };
+  } catch (error) {
+    console.error("Login error:", error);
 
-  return createSession(user);
+    throw new Error(
+      "Unable to save login session."
+    );
+  }
 }
 
+// ==========================================
+// 6. Get Currently Logged-in User
+// ==========================================
 export function getCurrentUser() {
   try {
-    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    const session = JSON.parse(
+      localStorage.getItem(SESSION_KEY) || "null"
+    );
 
+    // Validate session
     if (!session || !session.id || !session.name) {
       return null;
     }
 
     return session;
+
   } catch (error) {
     console.error("Session error:", error);
     return null;
   }
 }
 
+// ==========================================
+// 7. Check Authentication Status
+// ==========================================
 export function isAuthenticated() {
   return getCurrentUser() !== null;
 }
 
+// ==========================================
+// 8. Logout User
+// ==========================================
 export function logoutUser() {
   localStorage.removeItem(SESSION_KEY);
-  localStorage.removeItem("jwtToken");
-  localStorage.removeItem("userRole");
 }
