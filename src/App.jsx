@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "./context/ThemeContext"; // verify exact folder & export style
-import Signin from "./pages/Signin"
+import { ThemeProvider } from "./context/ThemeContext";
+import Signin from "./pages/Signin";
 import Login from "./pages/login";
 import Dashboard from "./pages/Dashboard";
 import Aptitude from "./pages/Aptitude";
@@ -12,8 +12,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import MockTests from "./pages/MockTests";
 import AIResumeAnalyzer from "./pages/AIResumeAnalyzer";
-import AdminPanel from "./pages/AdminPanel"; 
-import Signin from "./pages/Signin"; 
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   return (
@@ -33,12 +32,10 @@ function App() {
           <Route path="/mock-tests" element={<MockTests />} />
           <Route path="/ai-resume-analyzer" element={<AIResumeAnalyzer />} />
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/signup" element={<Signin />} />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
   );
-
 }
 
 export default App;
