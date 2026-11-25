@@ -14,8 +14,6 @@ import {
   FiLogOut,
   FiSettings,
   FiAward,
-  FiTrendingUp,
-  FiBriefcase,
 } from "react-icons/fi";
 
 const SHOW_UPGRADE_FEATURES = false;
@@ -24,12 +22,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode } = useTheme();
   const [user, setUser] = useState(null);
-
-  const [profileStats, setProfileStats] = useState({
-    course: "Not specified",
-    skillsCount: 0,
-    internshipsCount: 0,
-  });
+  const [course, setCourse] = useState("Not specified");
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -45,11 +38,7 @@ const Dashboard = () => {
       const savedProfile = localStorage.getItem("careerPilotProfile");
       if (savedProfile) {
         const data = JSON.parse(savedProfile);
-        setProfileStats({
-          course: data.currentCourse || "Not specified",
-          skillsCount: data.skills ? data.skills.length : 0,
-          internshipsCount: data.internships ? data.internships.length : 0,
-        });
+        setCourse(data.currentCourse || "Not specified");
       }
     } catch (error) {
       console.error("Could not load profile stats", error);
@@ -191,72 +180,10 @@ const Dashboard = () => {
                 {user.name || "User"}
               </h2>
               <p className="text-sm mt-2 text-indigo-100">
-                {profileStats.course}
+                {course}
               </p>
             </div>
             <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-          </div>
-
-          <div
-            className={`p-6 rounded-2xl shadow-md border flex flex-col justify-between ${
-              darkMode
-                ? "bg-slate-800 border-slate-700"
-                : "bg-white border-slate-200"
-            }`}
-          >
-            <div>
-              <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                <FiTrendingUp size={18} />
-                <span className="text-sm font-semibold tracking-wide uppercase">
-                  Skill Stack
-                </span>
-              </div>
-              <h2
-                className={`text-3xl font-bold mt-1 ${
-                  darkMode ? "text-white" : "text-slate-800"
-                }`}
-              >
-                {profileStats.skillsCount}
-              </h2>
-            </div>
-            <p
-              className={`text-sm mt-3 font-medium ${
-                darkMode ? "text-slate-400" : "text-slate-500"
-              }`}
-            >
-              Registered technical skills
-            </p>
-          </div>
-
-          <div
-            className={`p-6 rounded-2xl shadow-md border flex flex-col justify-between ${
-              darkMode
-                ? "bg-slate-800 border-slate-700"
-                : "bg-white border-slate-200"
-            }`}
-          >
-            <div>
-              <div className="flex items-center gap-2 text-blue-500 mb-2">
-                <FiBriefcase size={18} />
-                <span className="text-sm font-semibold tracking-wide uppercase">
-                  Experience
-                </span>
-              </div>
-              <h2
-                className={`text-3xl font-bold mt-1 ${
-                  darkMode ? "text-white" : "text-slate-800"
-                }`}
-              >
-                {profileStats.internshipsCount}
-              </h2>
-            </div>
-            <p
-              className={`text-sm mt-3 font-medium ${
-                darkMode ? "text-slate-400" : "text-slate-500"
-              }`}
-            >
-              Internships added to profile
-            </p>
           </div>
         </section>
       </main>
