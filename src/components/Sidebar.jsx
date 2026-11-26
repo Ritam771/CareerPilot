@@ -26,11 +26,7 @@ const Sidebar = () => {
   const { darkMode } = useTheme();
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    setUser(getCurrentUser());
-  }, []);
+const [user] = useState(() => getCurrentUser());
 
   const userRole = localStorage.getItem("userRole") || "USER";
 
@@ -190,7 +186,7 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {userRole === "ADMIN" && (
+        {userRole === "ROLE_ADMIN" && (
           <div>
             <NavLink to="/admin" className={navLinkStyles}>
               <FiShield className={darkMode ? "text-purple-400" : "text-purple-600"} />

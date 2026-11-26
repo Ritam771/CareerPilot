@@ -45,21 +45,22 @@ function Login() {
     }
 
     setIsLoading(true);
-    try {
-      const data = await loginUser(identifier, password);
-      
-      if (data && data.role) {
-        localStorage.setItem("userRole", data.role.toUpperCase());
-      } else {
-        localStorage.setItem("userRole", "ADMIN");
-      }
+    
+    const data = await loginUser(identifier, password);
 
-      navigate("/dashboard", { replace: true });
-    } catch (error) {
-      setNotice(error.message || "Login failed. Check your details and try again.");
-    } finally {
-      setIsLoading(false);
-    }
+const roleList = Array.isArray(data?.roles)
+  ? data.roles.map((r) => String(r).toUpperCase())
+  : data?.role
+    ? [String(data.role).toUpperCase()]
+    : ["ROLE_USER"];
+
+const primaryRole =
+  roleList.includes("ROLE_ADMIN") || roleList.includes("ADMIN")
+    ? "ROLE_ADMIN"
+    : roleList[0] || "ROLE_USER";
+
+localStorage.setItem("userRole", primaryRole);
+navigate("/dashboard", { replace: true });
   };
 
   const handleForgotPassword = () => {

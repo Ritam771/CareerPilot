@@ -32,7 +32,19 @@ const Dashboard = () => {
       return;
     }
 
-    setUser(currentUser);
+    let resolvedUser = currentUser;
+    if (!currentUser.name) {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem("careerPilotUser") || "null");
+        if (storedUser?.name) {
+          resolvedUser = { ...currentUser, name: storedUser.name, email: currentUser.email || storedUser.email };
+        }
+      } catch {
+        // Ignore malformed localStorage entry
+      }
+    }
+
+    setUser(resolvedUser);
 
     try {
       const savedProfile = localStorage.getItem("careerPilotProfile");
@@ -75,7 +87,7 @@ const Dashboard = () => {
         <header className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">
-              {getGreeting()}, {user.name || "User"}!
+              {getGreeting()}, {user.name || "User"}
             </h1>
 
             <p
@@ -138,7 +150,7 @@ const Dashboard = () => {
 
             <div className="flex items-center gap-3 ml-2">
               <Avatar
-                seed={user.name || "User"}
+                seed={user.name || "Hello"}
                 size="w-10 h-10"
                 className="border-2 border-indigo-500/50 shadow-sm"
               />

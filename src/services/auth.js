@@ -1,205 +1,107 @@
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
-const USERS_KEY = "careerPilotUsers";
+const TOKEN_KEY = "jwtToken";
 const SESSION_KEY = "careerPilotSession";
 
-// ==========================================
-// 1. Read Registered Users
-// ==========================================
-function readUsers() {
-  try {
-    const users = JSON.parse(
-      localStorage.getItem(USERS_KEY) || "[]"
-    );
-
-    return Array.isArray(users) ? users : [];
-  } catch (error) {
-    console.error("Error reading users:", error);
-    return [];
+function saveAuthResponse(data, fallbackEmail = "") {
+  if (data?.jwtToken) {
+    localStorage.setItem(TOKEN_KEY, data.jwtToken);
   }
-}
 
-// ==========================================
-// 2. Save Registered Users
-// ==========================================
-function saveUsers(users) {
-  localStorage.setItem(
-    USERS_KEY,
-    JSON.stringify(users)
-  );
-}
-
-// ==========================================
-// 3. Create User Session
-// ==========================================
-function createSession(user) {
   const session = {
-    id: user.id,
-    name: user.name,
-    // Older accounts stored the email/phone in "identifier"
-    email: user.email || user.identifier || "",
-    phone: user.phone || "",
+    name: data?.name || data?.user?.name || "",
+    email: data?.email || data?.user?.email || fallbackEmail,
+    roles: Array.isArray(data?.roles) ? data.roles : [],
   };
-
-  localStorage.setItem(
-    SESSION_KEY,
-    JSON.stringify(session)
-  );
-
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return session;
 }
-
-// ==========================================
-// 4. Register New User
-// ==========================================
 export async function registerUser(form) {
-  const users = readUsers();
-
-  const name = form.name?.trim();
-  const email = form.email?.trim().toLowerCase();
-  const phone = form.phone?.trim() || "";
-  const password = form.password;
-
-  // Validate required fields
-  if (!name || !email || !password) {
-    throw new Error("Please fill in all required fields.");
-  }
-
-  // Check duplicate email
-  const existingUser = users.find(
-    (user) => user.email?.toLowerCase() === email
-  );
-
-  if (existingUser) {
-    throw new Error(
-      "This email is already registered. Please login."
-    );
-  }
-
-  // Check duplicate phone
-  if (phone) {
-    const existingPhone = users.find(
-      (user) => user.phone === phone
-    );
-
-    if (existingPhone) {
-      throw new Error(
-        "This phone number is already registered."
-      );
-    }
-  }
-
-  // Create new user
-  const newUser = {
-    id:
-      globalThis.crypto?.randomUUID?.() ||
-      `user-${Date.now()}`,
-
-    name,
-    email,
-    phone,
-    password,
-
-    createdAt: new Date().toISOString(),
+  const payload = {
+    name: form.name?.trim(),
+    email: form.email?.trim().toLowerCase(),
+    phoneNumber: form.phone?.trim() || "",
+    password: form.password,
   };
 
-  try {
-    // Save registered user
-    saveUsers([...users, newUser]);
-
-    // Automatically create session after registration
-    const session = createSession(newUser);
-
-    return session;
-
-  } catch (error) {
-    console.error("Registration error:", error);
-
-    throw new Error(
-      "Unable to create account. Check browser storage."
-    );
-  }
-}
-
-// ==========================================
-// 5. Login User Using Email or Phone
-// ==========================================
-export async function loginUser(identifier, password) {
-  const users = readUsers();
-
-  const cleanIdentifier = identifier?.trim().toLowerCase();
-
-  if (!cleanIdentifier || !password) {
-    throw new Error(
-      "Please enter your email/phone and password."
-    );
-  }
-
-  // Find registered user
-  const user = users.find((item) => {
-    const emailMatch =
-      item.email?.toLowerCase() === cleanIdentifier ||
-      item.identifier?.toLowerCase() === cleanIdentifier;
-
-    const phoneMatch =
-      !!item.phone && item.phone === identifier.trim();
-
-    return (
-      (emailMatch || phoneMatch) &&
-      item.password === password
-    );
+  const response = await fetch(`${API_BASE_URL}/api/auth/register-user`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
 
-  if (!user) {
-    throw new Error(
-      "Invalid email/phone or password."
-    );
+  if (!response.ok) {
+    let message = "Unable to create your account.";
+    try {
+      const errBody = await response.json();
+      if (errBody?.message) message = errBody.message;
+    } catch {
+      // Non-JSON response
+    }
+    throw new Error(message);
   }
 
-  try {
-    // Create session for the logged-in user
-    return createSession(user);
-
-  } catch (error) {
-    console.error("Login error:", error);
-
-    throw new Error(
-      "Unable to save login session."
-    );
+  const data = await response.json().catch(() => ({}));
+  if (data?.jwtToken) {
+    saveAuthResponse(data, payload.email);
   }
+  return data;
 }
 
-// ==========================================
-// 6. Get Currently Logged-in User
-// ==========================================
+export async function loginUser(email, password) {
+  const cleanEmail = email?.trim().toLowerCase();
+
+  if (!cleanEmail || !password) {
+    throw new Error("Please enter your email and password.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: cleanEmail, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Invalid email or password.");
+  }
+
+  const data = await response.json();
+  if (!data?.jwtToken) {
+    throw new Error("Login succeeded, but jwtToken was missing.");
+  }
+
+  return saveAuthResponse(data, cleanEmail);
+}
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
 export function getCurrentUser() {
   try {
-    const session = JSON.parse(
-      localStorage.getItem(SESSION_KEY) || "null"
-    );
+    const token = localStorage.getItem(TOKEN_KEY);
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
 
-    // Validate session
-    if (!session || !session.id || !session.name) {
+    if (!token || !session || !session.email) {
       return null;
     }
 
-    return session;
-
+    return {
+      ...session,
+      name: session.name?.trim() || null,
+    };
   } catch (error) {
     console.error("Session error:", error);
     return null;
   }
 }
 
-// ==========================================
-// 7. Check Authentication Status
-// ==========================================
 export function isAuthenticated() {
-  return getCurrentUser() !== null;
+  return Boolean(getToken()) && getCurrentUser() !== null;
 }
 
-// ==========================================
-// 8. Logout User
-// ==========================================
 export function logoutUser() {
+  localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(SESSION_KEY);
 }

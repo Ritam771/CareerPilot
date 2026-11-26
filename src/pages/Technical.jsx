@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const filters = ["All", "Easy", "Medium", "Hard"];
@@ -18,6 +18,8 @@ const Technical = () => {
 
   // Fetch Technical topics and Companies dynamically from Spring Boot
   useEffect(() => {
+    let ignore = false;
+
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
@@ -26,8 +28,11 @@ const Technical = () => {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         };
 
+        const params = new URLSearchParams({ category: "TECHNICAL" });
+        const topicsUrl = `http://localhost:8080/api/question/get-questionbycategory?${params.toString()}`;
+
         const [topicsRes, compRes] = await Promise.all([
-          fetch("http://localhost:8080/api/technical/topics", { headers }),
+          fetch(topicsUrl, { headers }),
           fetch("http://localhost:8080/api/companies", { headers }),
         ]);
 
@@ -36,26 +41,41 @@ const Technical = () => {
         }
 
         const topicsData = await topicsRes.json();
-        setTopics(Array.isArray(topicsData) ? topicsData : []);
+        const compData = compRes.ok ? await compRes.json() : [];
 
-        if (compRes.ok) {
-          const compData = await compRes.json();
-          setCompanies(Array.isArray(compData) ? compData : []);
+        if (!ignore) {
+          setTopics(Array.isArray(topicsData) ? topicsData : []);
+          if (compRes.ok) {
+            setCompanies(Array.isArray(compData) ? compData : []);
+          }
         }
       } catch (err) {
-        setError(err.message || "Unable to connect to the backend.");
+        if (!ignore) {
+          setError(err.message || "Unable to connect to the backend.");
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
-  // Reset to page 1 whenever filters change
-  useEffect(() => {
+  const handleDifficultyChange = (filter) => {
+    setActiveFilter(filter);
     setCurrentPage(1);
-  }, [activeFilter, selectedCompany]);
+  };
+
+  const handleCompanyChange = (e) => {
+    setSelectedCompany(e.target.value);
+    setCurrentPage(1);
+  };
 
   // Helper for difficulty badge styling
   const getDifficultyColor = (difficulty) => {
@@ -140,7 +160,8 @@ const Technical = () => {
             {filters.map((filter) => (
               <button
                 key={filter}
-                onClick={() => setActiveFilter(filter)}
+                type="button"
+                onClick={() => handleDifficultyChange(filter)}
                 className={`px-5 py-1.5 rounded-full text-sm font-medium transition ${
                   activeFilter === filter
                     ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
@@ -163,7 +184,7 @@ const Technical = () => {
             <select
               id="technical-company-filter"
               value={selectedCompany}
-              onChange={(e) => setSelectedCompany(e.target.value)}
+              onChange={handleCompanyChange}
               className="rounded-lg border border-gray-700 bg-[#1e293b] px-3 py-1.5 text-sm text-white outline-none transition focus:border-emerald-500"
             >
               <option value="ALL">All Companies</option>
@@ -277,6 +298,7 @@ const Technical = () => {
         {/* FOOTER PAGINATION (Always visible) */}
         <footer className="mt-auto mb-6 flex items-center justify-center gap-2 border-t border-gray-800 pt-6">
           <button
+            type="button"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className="rounded-lg border border-gray-700 bg-[#1e293b] px-3.5 py-2 text-sm text-gray-300 transition hover:border-emerald-500 hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-40"
@@ -288,6 +310,7 @@ const Technical = () => {
             (page) => (
               <button
                 key={page}
+                type="button"
                 onClick={() => handlePageChange(page)}
                 className={`h-9 w-9 rounded-lg border text-sm font-semibold transition ${
                   currentPage === page
@@ -301,6 +324,7 @@ const Technical = () => {
           )}
 
           <button
+            type="button"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage >= Math.max(1, totalPages)}
             className="rounded-lg border border-gray-700 bg-[#1e293b] px-3.5 py-2 text-sm text-gray-300 transition hover:border-emerald-500 hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-40"

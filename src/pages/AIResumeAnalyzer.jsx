@@ -45,44 +45,56 @@ const AIResumeAnalyzer = () => {
       setScanProgress((prev) => (prev < 90 ? prev + 5 : prev));
     }, 300);
 
-    try {
-      const formData = new FormData();
-      formData.append("file", resumeFile);
+   try {
+  const token = localStorage.getItem("jwtToken");
 
-      const jdPayload = {
-        role: targetRole.trim() || "Software Engineer",
-        description: jobDescription.trim(),
-      };
+  if (!token) {
+    throw new Error("No JWT token found in localStorage. Please log in again.");
+  }
 
-      const jdBlob = new Blob([JSON.stringify(jdPayload)], {
-        type: "application/json",
-      });
-      formData.append("jd", jdBlob);
+  const formData = new FormData();
+  formData.append("file", resumeFile);
 
-      const response = await fetch("http://localhost:8080/api/resume/ats", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(errorBody || `Server error (${response.status})`);
-      }
-
-      const data = await response.json();
-      clearInterval(progressTimer);
-      setScanProgress(100);
-      setAnalysisResults(data);
-    } catch (err) {
-      clearInterval(progressTimer);
-      setScanProgress(0);
-      setErrorMessage(
-        err.message || "Could not connect to backend on http://localhost:8080."
-      );
-    } finally {
-      setIsAnalyzing(false);
-    }
+  const jdPayload = {
+    role: targetRole.trim() || "Software Engineer",
+    description: jobDescription.trim(),
   };
+
+  const jdBlob = new Blob([JSON.stringify(jdPayload)], {
+    type: "application/json",
+  });
+  formData.append("jd", jdBlob);
+
+  const response = await fetch("http://localhost:8080/api/resume/ats", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (response.status === 401 || response.status === 403) {
+    throw new Error("Unauthorized or expired token. Please log in again.");
+  }
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(errorBody || `Server error (${response.status})`);
+  }
+
+  const data = await response.json();
+  clearInterval(progressTimer);
+  setScanProgress(100);
+  setAnalysisResults(data);
+} catch (err) {
+  clearInterval(progressTimer);
+  setScanProgress(0);
+  setErrorMessage(
+    err.message || "Could not connect to backend on http://localhost:8080."
+  );
+} finally {
+  setIsAnalyzing(false);
+}}
 
   const resetAnalyzer = () => {
     setResumeFile(null);

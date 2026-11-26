@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FiExternalLink } from "react-icons/fi";
 
 function Coding() {
@@ -16,7 +16,7 @@ function Coding() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         };
 
-        const response = await fetch("http://localhost:8080/api/coding/problems", {
+        const response = await fetch("http://localhost:8080/api/coding/get-all-codingquestions", {
           headers,
         });
 
@@ -59,7 +59,7 @@ function Coding() {
     selectedFilter === "All"
       ? problems
       : problems.filter(
-          (p) => (p.difficulty || "").toLowerCase() === selectedFilter.toLowerCase()
+          (p) => (p.difficultyLevel || "").toUpperCase() === selectedFilter.toUpperCase()
         );
 
   const solvedCount = problems.filter((problem) => problem.solved).length;
@@ -67,11 +67,13 @@ function Coding() {
     problems.length > 0 ? Math.round((solvedCount / problems.length) * 100) : 0;
 
   const getDifficultyStyle = (difficulty) => {
-    const level = (difficulty || "").toLowerCase();
-    if (level === "easy")
+    const level = (difficulty || "").toUpperCase();
+    console.log("Difficulty level:", level); // Debugging line
+    if (level === "EASY")
       return "text-emerald-400 bg-emerald-400/10 border-emerald-400/20";
-    if (level === "medium")
+    else if (level === "MEDIUM")
       return "text-amber-400 bg-amber-400/10 border-amber-400/20";
+    else if (level === "HARD")
     return "text-rose-400 bg-rose-400/10 border-rose-400/20";
   };
 
@@ -85,7 +87,7 @@ function Coding() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="mb-6 flex flex-wrap gap-3">
-            {["All", "Easy", "Medium", "Hard"].map((filter) => (
+            {["All", "EASY", "MEDIUM", "HARD"].map((filter) => (
               <button
                 key={filter}
                 onClick={() => setSelectedFilter(filter)}
@@ -133,7 +135,7 @@ function Coding() {
                         <span className="mr-2 text-indigo-400">
                           #{problem.number ?? problem.id}
                         </span>
-                        {problem.title}
+                        {problem.questionName || problem.title || "Untitled Problem"}
                       </h2>
 
                       <input
@@ -152,10 +154,10 @@ function Coding() {
                   <div className="mt-4 flex items-center justify-between border-t border-slate-700/70 pt-3">
                     <span
                       className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${getDifficultyStyle(
-                        problem.difficulty
+                        problem.difficultyLevel
                       )}`}
                     >
-                      {problem.difficulty || "Medium"}
+                      {problem.difficultyLevel || "Medium"}
                     </span>
 
                     <a
