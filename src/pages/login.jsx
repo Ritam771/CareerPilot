@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../services/auth";
@@ -45,22 +46,31 @@ function Login() {
     }
 
     setIsLoading(true);
-    
-    const data = await loginUser(identifier, password);
 
-const roleList = Array.isArray(data?.roles)
-  ? data.roles.map((r) => String(r).toUpperCase())
-  : data?.role
-    ? [String(data.role).toUpperCase()]
-    : ["ROLE_USER"];
+    try {
+      const data = await loginUser(identifier, password);
 
-const primaryRole =
-  roleList.includes("ROLE_ADMIN") || roleList.includes("ADMIN")
-    ? "ROLE_ADMIN"
-    : roleList[0] || "ROLE_USER";
+      const roleList = Array.isArray(data?.roles)
+        ? data.roles.map((r) => String(r).toUpperCase())
+        : data?.role
+          ? [String(data.role).toUpperCase()]
+          : ["ROLE_USER"];
 
-localStorage.setItem("userRole", primaryRole);
-navigate("/dashboard", { replace: true });
+      const primaryRole =
+        roleList.includes("ROLE_ADMIN") || roleList.includes("ADMIN")
+          ? "ROLE_ADMIN"
+          : roleList[0] || "ROLE_USER";
+
+      localStorage.setItem("userRole", primaryRole);
+
+      navigate("/dashboard", { replace: true });
+
+    } catch (error) {
+      setNotice(error.message || "Login failed. Please try again.");
+
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -70,73 +80,105 @@ navigate("/dashboard", { replace: true });
     );
   };
 
+  // Transparent glass input styling
   const inputClass =
-    "peer h-12 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-teal-600 focus:ring-4 focus:ring-teal-600/15";
+    "peer h-12 w-full rounded-xl border border-white/25 bg-white/10 pl-11 pr-4 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-white/55 hover:border-white/50 focus:border-teal-300 focus:bg-white/15 focus:ring-4 focus:ring-teal-300/15";
+
   const iconClass =
-    "pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition peer-focus:text-teal-600";
+    "pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/65 transition peer-focus:text-teal-200";
 
   return (
-    <div className="flex min-h-screen bg-white">
-      {/* Left: brand panel */}
-      <section className="relative hidden w-[52%] overflow-hidden bg-[#0A1B2E] lg:flex flex-col">
-        {/* Background Image: object-top keeps the upper sky visible and pushes the peak lower */}
-        <img
-          src="/Mountain.png" 
-          alt="Mountain Sunrise"
-          className="absolute inset-0 h-full w-full object-cover object-top"
-          onError={(e) => (e.currentTarget.style.display = "none")}
-        />
-        {/* Soft gradient to keep the bottom-left text crisp while preserving the sunrise */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/10" />
+    <div className="relative flex min-h-screen overflow-hidden bg-[#07182a]">
+
+      {/* Full-page mountain background */}
+      <img
+        src="/Mountain.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover object-center"
+      />
+
+      {/* Overall dark transparent overlay */}
+      <div className="absolute inset-0 bg-slate-950/35" />
+
+      {/* LEFT SIDE */}
+      <section className="relative hidden w-[52%] flex-col overflow-hidden lg:flex">
+
+        {/* Left-side background overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-black/10" />
 
         <div className="relative z-10 flex h-full w-full flex-col justify-between px-10 pb-10 pt-2 xl:px-14 xl:pb-14 xl:pt-3">
-          
-          {/* Logo: High up at the top of the sky above the mountain peak */}
+
+          {/* Logo */}
           <div className="flex w-full justify-center">
             <img
               src="/logo.png"
               alt="CareerPilot"
-              className="h-24 xl:h-28 w-auto object-contain drop-shadow-2xl"
+              className="h-24 w-auto object-contain drop-shadow-2xl xl:h-28"
               onError={(e) => (e.currentTarget.style.display = "none")}
             />
           </div>
 
-          {/* Highlights: Top 3 features tucked cleanly in Bottom Left */}
+          {/* Highlights */}
           <div className="pb-4">
             <ul className="max-w-md space-y-3.5">
               {highlights.map(({ icon: Icon, title }) => (
-                <li key={title} className="flex items-center gap-3.5">
-                  {/* Hazy frosted teal circle */}
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-teal-300/25 bg-teal-900/50 text-teal-100 backdrop-blur-md shadow-lg">
+                <li
+                  key={title}
+                  className="flex items-center gap-3.5"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-teal-300/30 bg-teal-900/40 text-teal-100 shadow-lg backdrop-blur-xl">
                     <Icon size={18} />
                   </span>
-                  <p className="text-sm xl:text-base font-medium text-white/95 drop-shadow-md tracking-wide">
+
+                  <p className="text-sm font-medium tracking-wide text-white/95 drop-shadow-md xl:text-base">
                     {title}
                   </p>
                 </li>
               ))}
             </ul>
           </div>
-
         </div>
       </section>
 
-      {/* Right: form */}
-      <section className="flex flex-1 items-center justify-center bg-slate-50 px-5 py-10 sm:px-10">
-        <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-900/5 sm:p-10">
+      {/* RIGHT SIDE - TRANSPARENT BACKGROUND */}
+      <section className="relative flex flex-1 items-center justify-center overflow-hidden bg-white/[0.03] px-5 py-10 sm:px-10">
+
+        {/* Subtle glass lighting effects */}
+        <div className="pointer-events-none absolute -right-16 -top-16 h-80 w-80 rounded-full bg-teal-400/15 blur-3xl" />
+
+        <div className="pointer-events-none absolute -bottom-20 -left-16 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl" />
+
+        {/* GLASS LOGIN CARD */}
+        <div className="relative z-10 w-full max-w-md rounded-3xl border border-white/25 bg-slate-900/25 p-7 shadow-[0_8px_40px_rgba(0,0,0,0.25)] backdrop-blur-2xl sm:p-10">
+
           <div className="mb-8">
-            <span className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-teal-700 text-white lg:hidden">
+
+            <span className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-teal-200 backdrop-blur-xl lg:hidden">
               <FiCompass size={20} />
             </span>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Welcome back</h1>
-            <p className="mt-2 text-sm text-slate-500">Log in to pick up where you left off.</p>
+
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
+              Welcome back
+            </h1>
+
+            <p className="mt-2 text-sm text-white/70">
+              Log in to pick up where you left off.
+            </p>
+
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
+
+            {/* EMAIL */}
             <div>
-              <label htmlFor="identifier" className="mb-2 block text-sm font-medium text-slate-700">
+              <label
+                htmlFor="identifier"
+                className="mb-2 block text-sm font-medium text-white/90"
+              >
                 Email or phone number
               </label>
+
               <div className="relative">
                 <input
                   id="identifier"
@@ -147,24 +189,35 @@ navigate("/dashboard", { replace: true });
                   placeholder="you@example.com"
                   className={inputClass}
                 />
+
                 <FiMail className={iconClass} size={17} />
               </div>
             </div>
 
+            {/* PASSWORD */}
             <div>
+
               <div className="mb-2 flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-slate-700">
+
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-white/90"
+                >
                   Password
                 </label>
+
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="text-xs font-medium text-teal-700 hover:underline"
+                  className="text-xs font-medium text-teal-200 hover:text-teal-100 hover:underline"
                 >
                   Forgot password?
                 </button>
+
               </div>
+
               <div className="relative">
+
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -174,26 +227,34 @@ navigate("/dashboard", { replace: true });
                   placeholder="Enter your password"
                   className={`${inputClass} pr-12`}
                 />
+
                 <FiLock className={iconClass} size={17} />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-teal-700"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/65 transition hover:text-teal-200"
                 >
-                  {showPassword ? <FiEyeOff size={17} /> : <FiEye size={17} />}
+                  {showPassword ? (
+                    <FiEyeOff size={17} />
+                  ) : (
+                    <FiEye size={17} />
+                  )}
                 </button>
+
               </div>
             </div>
 
+            {/* ERROR / INFO MESSAGE */}
             {message && (
               <div
                 role="alert"
                 aria-live="polite"
-                className={`flex gap-2 rounded-xl border px-3.5 py-3 text-sm ${
+                className={`flex gap-2 rounded-xl border px-3.5 py-3 text-sm backdrop-blur-xl ${
                   messageType === "info"
-                    ? "border-sky-200 bg-sky-50 text-sky-800"
-                    : "border-red-200 bg-red-50 text-red-700"
+                    ? "border-sky-300/50 bg-sky-400/15 text-sky-100"
+                    : "border-red-300/50 bg-red-400/15 text-red-100"
                 }`}
               >
                 <FiAlertCircle className="mt-0.5 shrink-0" size={16} />
@@ -201,26 +262,42 @@ navigate("/dashboard", { replace: true });
               </div>
             )}
 
+            {/* LOGIN BUTTON */}
             <button
               type="submit"
               disabled={isLoading}
-              className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-700 font-semibold text-white shadow-lg shadow-teal-700/25 transition hover:bg-teal-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-600/30 disabled:cursor-not-allowed disabled:opacity-60"
+              className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-teal-300/30 bg-teal-600/85 font-semibold text-white shadow-lg shadow-teal-900/30 backdrop-blur-xl transition hover:bg-teal-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-300/30 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "Logging in…" : "Log in"}
-              {!isLoading && <FiArrowRight className="transition group-hover:translate-x-0.5" size={18} />}
+
+              {!isLoading && (
+                <FiArrowRight
+                  className="transition group-hover:translate-x-0.5"
+                  size={18}
+                />
+              )}
             </button>
+
           </form>
 
-          <p className="mt-8 text-center text-sm text-slate-500">
+          {/* SIGNUP */}
+          <p className="mt-8 text-center text-sm text-white/80">
             New to CareerPilot?
-            <Link to="/signup" className="ml-1 font-semibold text-teal-700 hover:underline">
+
+            <Link
+              to="/signup"
+              className="ml-1 font-semibold text-teal-200 hover:text-teal-100 hover:underline"
+            >
               Create an account
             </Link>
           </p>
 
-          <p className="mt-6 text-center text-xs leading-5 text-slate-400">
-            Frontend demo: accounts are saved only in this browser. Connect Spring Boot before using real student accounts.
+          {/* FOOTER */}
+          <p className="mt-6 text-center text-xs leading-5 text-white/60">
+            Frontend demo: accounts are saved only in this browser.
+            Connect Spring Boot before using real student accounts.
           </p>
+
         </div>
       </section>
     </div>
